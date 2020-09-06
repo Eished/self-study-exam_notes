@@ -1,4 +1,4 @@
-# 大纲
+# 大纲 (2019版)
 
 ## 考试题型
 
@@ -18,7 +18,14 @@
 ## IDE 
 
 - 书本推荐：Dev C++ 5.11
-- 本人使用：VSCode
+
+- 本人使用：VScode
+
+  - 解决utf-8中文乱码问题, 在vs code修改代码的打开和保存方式
+
+    直接就将代码保存为gb2312。在vs code右下角可以看到当前文件编码方式，点击utf-8修改打开和保存方式为gb2312。
+
+  - VScode 执行完会自动关闭终端, return 前设置断点
 
 # 第一章 C++ 语言简介
 
@@ -32,9 +39,189 @@
 
 ## 第一节 C++发展简史
 
+- 低级语言：机器语言，汇编语言
+- 中级语言：C语言
+- 高级语言：面向用户，易懂、通用。
+
 ## 第二节 C++特点
 
+- 编译式、通用、大小写敏感，支持面向对象
+- 特点
+  - 继承和兼容C 语言，简洁高效
+  - 面向对象
+
+### 一、基本输入/输出
+
+- 输入：空格、TAB、ENTER 作为分隔符
+
+  ```C++
+  #include <iostream>
+  using namespace std;
+  int main()
+  {
+    int a = 1, b = 2;
+    cin >> a >> b;
+    cout << "Hello Vscode\n"
+      << a * b
+      << endl;
+    return 0;
+  }
+  ```
+
+- 输入/输出示例
+
+  ```C++
+  #include <iostream>
+  #include <string>
+using namespace std;
+  int main()
+  {
+    int oneInt1, oneInt2;
+    char strArray[20];
+    string str;
+    double oneDouble;
+    char oneChar = 'a';
+    cout << "输入两个整型值，一个字符，一个字符串，一个浮点值,";
+    cout << "以空格、tab、enter 键分割" << endl;
+    cin >> oneInt1 >> oneInt2 >> oneChar >> strArray >> oneDouble;
+    str = strArray;
+    cout << "输入的数据是:" << endl;     //endl 是换行
+    cout << "字符串:\t\t" << str << endl //\t是制表符
+         << "两个整型值:\t" << oneInt1 << "和\t" << oneInt2 << endl
+         << "字符:\t\t" << oneChar << "\n" //"\n"是换行符,与endl相同
+         << "浮点值:\t\t" << oneDouble << endl;
+    return 0;
+  }
+  ```
+  
+- `cin` 输入字符类型时根据变量类型自动提取相应长度字节, 数值类型数据需要分隔
+
+- `getchar()`: 获取 space\tab\enter 等特殊字符
+
+- ```C++
+  cout <<"1234\ 	//"\" 用于连接换行的内容
+  566785"<<endl;
+  ```
+
+- `cout` 自动识别输出类型
+
+
+
+### 二、头文件和命名空间
+
+- 常用的头文件
+
+  - 标准输入输出流: `<iostream>`
+  - 标准文件流: `<fstream>`
+  - 标准字符串处理函数: `<string>`
+  - 标准数学函数: `<cmath>`
+
+- 自定义头文件
+
+  - `<>`: 系统设定目录寻找, 未找到再去指定目录找
+  - `“”`: 用户当前目录或指定目录找
+    - `#include "e:\myprog\ex1.h"`
+
+- 命名空间 `using namespace std`
+
+  - 为了避免不同人开发时命名冲突
+
+    - ```C++
+      namespace 命名空间名
+      {
+      命名空间内各种声明(函数声明\类声明)
+      }
+      ```
+
+  - 引用命名空间标识符
+
+    - 不引用命名空间, 则使用全称: `命名空间名::标识符名`
+
+    - ```C++
+      using 命名空间名::标识符; // 单独引用
+      using namespace 命名空间名; // 引用整个命名空间
+      ```
+
+
+
+### 三、强制类型转换运算符
+
+- 不同类型量混合运算时, 系统自动执行类型转换, 也可使用 强制类型转换运算符 `static_cast` 或 `const_cast` 进行转换
+
+  - ```C++
+    static_cast<类型名>(表达式); //static_cast 可以省略
+    
+    oneInt2=static_cast<int>(oneDouble); //强制类型转换
+    oneInt2=int(oneDouble); //强制类型转换运算符的新形式
+    oneInt2=(int)oneDouble; //强制类型转换运算符的旧形式
+    oneInt2=oneDouble; //自动类型转换
+    ```
+
+  - ```C++
+    const_cast<类型名>(表达式); 
+    ```
+
+    - 用于去除指针和引用的常量性,不能去除变量的常量性
+    - 常量指针转化为非常量指针, 任指向原对象
+    - 常量引用转化为非常量引用, 任指向原对象
+    - 指针的教程: https://www.imooc.com/video/7858
+
+  - 示例: 
+
+    ```C++
+    #include <iostream>
+    using namespace std;
+    int main()
+    {
+      int a = 10;
+      const int *p = &a; //不能使用常量指针p修改a的值,"&"取地址符
+      const int ca = 30; //被const修饰
+      int *q;
+      cout << "a的内存地址为:\t" << &a << "\t a的值为:\t" << a << endl;
+      cout << "p指向的地址为:\t" << &p << "\t *p的值为:\t" << *p << endl;
+      cout << "分界线" << endl;
+      q = const_cast<int *>(p); //去除p的常量性赋给q,如果写q=p;会报错
+      *q = 20;                  //如果写*p=20;是错误的
+      cout << "a的内存地址为:\t" << &a << "\t a的值为:\t" << a << endl;
+      cout << "p指向的地址为:\t" << &p << "\t *p的值为:\t" << *p << endl;
+      cout << "q指向的地址为:\t" << &q << "\t *q的值为:\t" << *p << endl;
+      cout << "分界线" << endl;
+      p = &ca;                  //ca的值不能修改
+      q = const_cast<int *>(p); //去除p的常量性赋给q,如果写q=p;会报错
+      *q = 40;                  //如果写*p=40;是错误的
+      cout << "ca的内存地址为:\t" << &ca << "\t ca的值为:\t" << ca << endl;
+      cout << "p指向的地址为:\t" << &p << "\t *p的值为:\t" << *p << endl;
+      cout << "q指向的地址为:\t" << &q << "\t *q的值为:\t" << *p << endl;
+      cout << "分界线" << endl;
+      return 0;
+    }
+    ```
+
+- 
+
+
+
 ## 第三节 C++程序结构
+
+- .cpp 文件格式
+
+- 有且只有一个主函数 main() , 程序从主函数开始执行
+
+- 主函数结束
+
+  - 主函数中遇到 return
+  - 执行到主函数后面 }
+
+- 主函数可以调用其他函数, 其他函数不能调用主函数
+
+- ```C++
+  /* 
+  多行注释
+  多行注释
+  */
+  
+  // 单行注释
+  ```
 
 
 
