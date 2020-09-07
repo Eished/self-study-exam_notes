@@ -1,3 +1,5 @@
+> https://github.com/Eished/self-study-exam_notes
+
 # 大纲 (2019版)
 
 ## 考试题型
@@ -162,9 +164,10 @@ using namespace std;
     ```
 
     - 用于去除指针和引用的常量性,不能去除变量的常量性
-    - 常量指针转化为非常量指针, 任指向原对象
+    - 常量指针转化为非常量指针, 任指向原对象(const int *p=> int *p)
     - 常量引用转化为非常量引用, 任指向原对象
     - 指针的教程: https://www.imooc.com/video/7858
+      - 指针的本质就是内存地址
 
   - 示例: 
 
@@ -174,7 +177,7 @@ using namespace std;
     int main()
     {
       int a = 10;
-      const int *p = &a; //不能使用常量指针p修改a的值,"&"取地址符
+      const int *p = &a; //不能使用常量指针p修改a的值,"&"取地址符,"*"从地址取值
       const int ca = 30; //被const修饰
       int *q;
       cout << "a的内存地址为:\t" << &a << "\t a的值为:\t" << a << endl;
