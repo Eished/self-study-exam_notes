@@ -553,17 +553,431 @@ using namespace std;
 
 ## 第一节 结构化程序设计
 
+- 将复杂功能模块化, 化繁为简, 从高层到底层 
+- 三种基本控制结构: 顺序/选择/循环
+  - 数据结构+算法=程序
+- 复杂, 难以维护, 难以复用
+
 ## 第二节 面向对象程序设计的概念和特点
+
+- 方法
+  - 面向对象的分析, 面向对象的设计, 面向对象的程序设计
+- 对象的特性
+  - 状态: 对象本身的信息, 也叫属性
+  - 行为: 对对象的操作, 也叫函数
+- 类
+  - 同一类对象的共同属性(静态特征)和行为(动态特征)
+- 面对对象程序设计的特点
+  - 抽象: 同类事物的共同特点概括出来
+  - 封装: 对象的属性和操作结合, 对象的属性和操作隐藏, 只给出如何使用
+  - 继承: 编写新类时, 以现有类为基础派生, 达到代码扩充和复用
+  - 多态: 不同种类的对象都具有名字形同的行为, 而实现方式不同
 
 ## 第三节 类的初步知识
 
+1. 类的定义
+
+   - 基本数据类型
+
+     - bool 布尔型
+     - char 字符型
+     - int 整型
+     - float 浮点型
+     - double 双精度浮点型
+
+   - C++ 中类时用户自定义的数据类型
+
+     - 先定义类型
+     - 声明基本数据类型(对象)
+
+   - 格式
+
+     - ```C++
+       class 类名
+       {
+       访问范围说明符:
+       	成员变量1
+       	成员变量2
+       	...
+       	成员函数声明1
+       	成员函数声明2
+       	...
+       访问范围说明符:
+       	更多成员变量
+       	更多成员函数声明
+       	...
+       };
+       ```
+
+     - 类名不能重复
+
+     - 类定义以“;”结束
+
+     - 访问范围说明符: public(公有) private(私有) protected(保护)
+
+   - 定义类时系统不分配内存, 而是把类看成模板
+
+   - 类成员
+
+     - 按功能划分: 成员变量和成员函数
+       - 成员变量私有, 类外不可访问, 为每个成员变量定义一对访问函数, 设置函数和获取函数
+       - 成员函数可以重载, 可以设定默认值
+     - 按权限划分: 公有成员/私有成员/保护成员
+
+   - 不属于任何类的函数: 全局函数
+
+   - 在类外定义成员函数
+
+     - inline 内联
+
+     - 类内有函数原型
+
+       ```C++
+       返回值类型 类名::成员函数名(参数列表)
+       {
+       	成员函数的函数体
+       }
+       ```
+
+2. 类的定义示例
+
+   - myDate
+
+     ```C++
+     class myDate
+     {
+     public:
+       myDate();                    //构造函数
+       myDate(int, int, int);       //构造函数
+       void setDate(int, int, int); //设置日期
+       void setDate(myDate);        //设置日期
+       myDate getDate();            //获取日期
+       void setYear(int);           //设置年
+       int getMonth();              //获取月
+       void printDate() const;      //打印日期
+     
+     private:
+       int year, month, day; //成员变量,年月日
+     };
+     //类体外定义成员函数
+     myDate::myDate()
+     {
+       year = 1970, month = 1, day = 1;
+     }
+     myDate::myDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+     }
+     void myDate::setDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+       return;
+     }
+     void myDate::setDate(myDate oneD)
+     {
+       year = oneD.year;
+       month = oneD.month;
+       day = oneD.day;
+       return;
+     }
+     myDate myDate::getDate()
+     {
+       return *this;
+     }
+     void myDate::setYear(int y)
+     {
+       year = y;
+       return;
+     }
+     int myDate::getMonth()
+     {
+       return month;
+     }
+     
+     void myDate::printDate() const
+     {
+       cout << year << "/" << month << "/" << day;
+       return;
+     }
+     ```
+
+   - Student
+
+     ```C++
+     class Student
+     {
+     public:
+       void setStudent(string, myDate); //设置学生信息
+       void setName(string);            //设置姓名
+       string getName();                //获取姓名
+       void setBirthday(myDate);        //设置生日
+       myDate getBirthday();            //获取生日
+       void printStudent() const;       //打印信息
+     
+     private:
+       string name;     //姓名
+       myDate birthday; //生日
+     };
+     //类体外定义成员函数
+     void Student::setStudent(string s, myDate d)
+     {
+       name = s;
+       birthday.setDate(d);
+       return;
+     }
+     void Student::setName(string n)
+     {
+       name = n;
+       return;
+     }
+     string Student::getName()
+     {
+       return name;
+     }
+     void Student::setBirthday(myDate d)
+     {
+       birthday.setDate(d);
+       return;
+     }
+     myDate Student::getBirthday()
+     {
+       return birthday;
+     }
+     void Student::printStudent() const
+     {
+       cout << "姓名:" << name << "\t生日:";
+       birthday.printDate(); //调用类myDate 的成员函数
+       cout << endl;
+     }
+     ```
+
+     
+
 ## 第四节 类的示例程序剖析
+
+1. 程序结构
+
+   - 主函数
+   - 类和全局函数
+   - 全局说明
+   - 注释
+   - 头文件
+
+2. 成员变量与成员函数的定义
+
+3. 创建类对象的基本形式
+
+   - 对象是类的实例
+
+   - ```C++
+     类名 对象名;
+     类名 对象名(参数);
+     类名 对象名 = 类名(参数);
+     类名 对象名1, 对象名2,...;
+     类名 对象名1(参数),对象名2(参数),...;
+     ```
+
+   - 用 new 创建对象时返回的是一个对象的指针, 必须用 delete 来撤销
+
+     ```C++
+     类名 *对象指针名 = new 类名;			 //成员变量不初始化
+     类名 *对象指针名 = new 类名();    //成员变量初始化
+     类名 *对象指针名 = new 类名(参数);
+     ```
+
+   - 声明对象引用, 即别名
+
+     ```C++
+     类名 &对象引用名 = 对象;
+     类名 *对象指针名 = 对象的地址;
+     类名 对象数组名[数组大小];
+     ```
+
+   - 同类型对象之间可以相互赋值, 对象和对象指针都可以用作函数参数, 函数返回值可以使对象或指针
+
+     ```C++
+     C a1, b1;   //定义了C类的对象a1,b1
+     C *p = &a1; //指向对象a1的C类指针p
+     C &R = b1;  //C类对象b1的引用R
+     C A[3];     //C类对象的数组A,含三个元素
+     ```
+
+
 
 ## 第五节 访问对象的成员
 
+1. 使用对象访问成员变量与调用成员函数
+
+   - 调用格式
+
+     - `对象名.成员变量名`
+     - `对象名.成员函数名(参数表)`
+
+   - 验证 Student 的操作
+
+     ```C++
+     #include <iostream>
+     #include <string>
+     using namespace std;
+     class myDate
+     {
+     public:
+       myDate();                    //构造函数
+       myDate(int, int, int);       //构造函数
+       void setDate(int, int, int); //设置日期
+       void setDate(myDate);        //设置日期
+       myDate getDate();            //获取日期
+       void setYear(int);           //设置年
+       int getMonth();              //获取月
+       void printDate() const;      //打印日期
+     
+     private:
+       int year, month, day; //成员变量,年月日
+     };
+     //类体外定义成员函数
+     myDate::myDate()
+     {
+       year = 1970, month = 1, day = 1;
+     }
+     myDate::myDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+     }
+     void myDate::setDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+       return;
+     }
+     void myDate::setDate(myDate oneD)
+     {
+       year = oneD.year;
+       month = oneD.month;
+       day = oneD.day;
+       return;
+     }
+     myDate myDate::getDate()
+     {
+       return *this;
+     }
+     void myDate::setYear(int y)
+     {
+       year = y;
+       return;
+     }
+     int myDate::getMonth()
+     {
+       return month;
+     }
+     
+     void myDate::printDate() const
+     {
+       cout << year << "/" << month << "/" << day;
+       return;
+     }
+     class Student
+     {
+     public:
+       void setStudent(string, myDate); //设置学生信息
+       void setName(string);            //设置姓名
+       string getName();                //获取姓名
+       void setBirthday(myDate);        //设置生日
+       myDate getBirthday();            //获取生日
+       void printStudent() const;       //打印信息
+     
+     private:
+       string name;     //姓名
+       myDate birthday; //生日
+     };
+     //类体外定义成员函数
+     void Student::setStudent(string s, myDate d)
+     {
+       name = s;
+       birthday.setDate(d);
+       return;
+     }
+     void Student::setName(string n)
+     {
+       name = n;
+       return;
+     }
+     string Student::getName()
+     {
+       return name;
+     }
+     void Student::setBirthday(myDate d)
+     {
+       birthday.setDate(d);
+       return;
+     }
+     myDate Student::getBirthday()
+     {
+       return birthday;
+     }
+     void Student::printStudent() const
+     {
+       cout << "姓名:" << name << "\t生日:";
+       birthday.printDate(); //调用类myDate 的成员函数
+       cout << endl;
+     }
+     int main()
+     {
+       Student ss;
+       int y, m, d;
+       string name_;
+       cout << "请输入学生的姓名和生日, 生日以\"年 月 日\"的次序输入:";
+       cin >> name_ >> y >> m >> d;
+       ss.setStudent(name_, myDate(y, m, d));
+       ss.printStudent();
+       return 0;
+     }
+     ```
+
+     
+
+2. 使用指针访问对象的成员
+
+   - 使用指针`对象.成员`  变成 `指针->成员`
+
+3. 使用引用访问对象的成员
+
+   - `引用.成员`
+
+
+
 ## 第六节 类成员的可访问范围
 
+1. 访问范围说明符的含义
+   - public: 公有, 任何地方可以访问
+   - private: 私有, 仅能在本类中被访问
+   - protected: 允许本类及子类中被访问
+2. 成员的访问
+   - 代码略
+3. 隐藏的作用
+   - 有利于程序修改, 避免错误
+
 ## 第七节 标识符的作用域与可见性
+
+1. 函数原型作用域
+   - 最小的作用域, 例如: 形参
+2. 局部作用域
+   - 一对大括号括起来的的一段程序,称为块
+   - 块内作用域称为局部作用域, 变量叫局部变量
+3. 类作用域
+   - 类成员访问类成员的作用域
+4. 命名空间作用域
+   - 定义一个命名空间, 该命名空间之内声明的,不属于前面各个作用域的标识符, 都属于该命名空间作用域
+   - 在不同的作用域声明的标识符, 可见性的一般原则:
+     - 标识符声明在前, 引用在后
+     - 同一份作用域中, 不能声明同名的标识符; 不同作用域可以声明同名标识符
+     - 包含关系的作用域中, 外层对内层可见; **如果内层声明了同名标识符, 则外层对内层标识符不可见**, 称为隐藏规则
 
 
 
