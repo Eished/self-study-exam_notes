@@ -265,6 +265,7 @@ using namespace std;
   - 作为函数的参数, 也可作为函数的返回值
   
   - 函数参数的传递方式
+    
     - 传值: 传递对象的值
   - 传引用: 传递对象的首地址(等同于指针)
   
@@ -305,6 +306,7 @@ using namespace std;
            << endl;
       return 0;
     }
+    ```
   ```
   
   - 引用作为函数的返回值
@@ -332,8 +334,8 @@ using namespace std;
       cout << "oneY=" << oneY << endl; //输出oneY=40
       return 0;
     }
-    ```
-    
+  ```
+  
     - 函数返回值也可以是指针
       - `类型标识符 * 函数名(实参列表)`
 
@@ -993,42 +995,779 @@ using namespace std;
 ## 第一节 构造函数
 
 1. 构造函数的作用
+
+   - 对象初始化, 成员变量赋初值
+
 2. 构造函数的定义
+
+   - 构造函数与类名相同, 无返回值, 一个类可以有多个构造函数(参数不能相同), 允许重载
+
+   - `类名(形参1,形参2,...形参n);`
+
+   - ```C++
+     // 类外定义构造函数
+     // 成员变量 x1,x2,...,xn;
+     // 形式1
+     类名::类名(形参1,形参2,...形参n):x1(形参1),x2(形参2),...,xn(形参n){}
+     
+     // 形式2
+     类名::类名(形参1,形参2,...,形参n)
+     {
+       x1 = 形参1;
+       x2 = 形参2;
+       ...
+       xn = 形参n;
+     }
+     
+     // 形式3
+     类名::类名()
+     {
+     	x1 = 初始化表达值1;
+     	x2 = 初始化表达值2;
+     	...
+     	xn = 初始化表达值n;
+     }
+     ```
+
+     
+
 3. 构造函数的使用
+
+   - 创建对象时根据调用语句中所带实参数量确定使用哪个构造函数
+
+   - 使用 new 创建对象指针
+
+     - `myDate *p = new myDate;` 括号可加可不加
+     - 加括号, 系统分配内存时初始化为 0
+     - 不加括号时, 只分配内存, 不初始化(随机值)
+
+   - 声明对象数组, 每一个元素都是对象, 一定要定义无参构造函数来初始化
+
+     - 特例, 声明数组时给各元素赋初值, 不用无参构造函数
+
+   - ```C++
+     int main()
+     {
+       Student stud;
+       stud.printStudent();                           //输出默认值
+       stud.setName("111");                           //姓名改为111
+       stud.printStudent();                           //输出修改后的值 111
+       Student *spointer[2] = {new Student(), &stud}; //初始化
+       Student sy[2] = {Student(), stud};             //初始化 分配新的内存地址
+       for (int i = 0; i < 2; i++)                    //使用指针输出指针指向的对象的值
+         spointer[i]->printStudent();                 //姓名111
+       for (int i = 0; i < 2; i++)                    //使用点运算符输出各值
+         sy[i].printStudent();                        //姓名111
+       stud.setName("222");                           //姓名222
+       for (int i = 0; i < 2; i++)                    //sp[1]指向的对象的值改变
+         spointer[i]->printStudent();                 //姓名222
+       spointer[0]->setName("333");                   //影响student的值
+       spointer[1]->setName("444");                   //影响stud的值
+       for (int i = 0; i < 2; i++)                    //指向对象的值都改变
+         spointer[i]->printStudent();                 // 姓名444
+       stud.printStudent();                           //值变成 姓名444 生日1970
+       for (int i = 0; i < 2; i++)
+         sy[i].printStudent(); //值不变
+       // 姓名NoName 生日1970
+       // 姓名111 生日1970
+       return 0;
+     }
+     ```
+
+     
+
 4. 复制构造函数与类型转换构造函数
+
+   - 使用已有对象来建立一个新对象
+
+   - 复制构造函数总是存在的
+
+   - 格式
+
+     - ```C++
+       class 类名
+       {
+       public:
+       	类名(参数表);				//构造函数
+       	类名(类名 & 对象名);	 //复制构造函数
+       	...
+       };
+       类名::类名(类名 & 对象名) //复制构造函数的实现
+       {
+       	函数体
+       }
+       ```
+
+   - ```C++
+     #include <iostream>
+     #include <string>
+     using namespace std;
+     class myDate
+     {
+     public:
+       myDate();                    //构造函数
+       myDate(int, int, int);       //构造函数
+       void setDate(int, int, int); //设置日期
+       void setDate(myDate);        //设置日期
+       myDate getDate();            //获取日期
+       void setYear(int);           //设置年
+       int getMonth();              //获取月
+       void printDate() const;      //打印日期
+     
+     private:
+       int year, month, day; //成员变量,年月日
+     };
+     //类体外定义成员函数
+     myDate::myDate()
+     {
+       year = 1970, month = 1, day = 1;
+     }
+     myDate::myDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+     }
+     void myDate::setDate(int y, int m, int d)
+     {
+       year = y;
+       month = m;
+       day = d;
+       return;
+     }
+     void myDate::setDate(myDate oneD)
+     {
+       year = oneD.year;
+       month = oneD.month;
+       day = oneD.day;
+       return;
+     }
+     myDate myDate::getDate()
+     {
+       return *this;
+     }
+     void myDate::setYear(int y)
+     {
+       year = y;
+       return;
+     }
+     int myDate::getMonth()
+     {
+       return month;
+     }
+     
+     void myDate::printDate() const
+     {
+       cout << year << "/" << month << "/" << day;
+       return;
+     }
+     
+     class Student
+     {
+     public:
+       Student();                       //构造函数,无参数
+       Student(string);                 //构造函数,带一个参数
+       void setStudent(string, myDate); //设置学生信息
+       void setName(string);            //设置姓名
+       string getName();                //获取姓名
+       void setBirthday(myDate);        //设置生日
+       myDate getBirthday();            //获取生日
+       void printStudent() const;       //打印信息
+       Student(const Student &s);       //声明复制构造函数
+     
+     private:
+       string name;     //姓名
+       myDate birthday; //生日
+     };
+     
+     //定义构造函数
+     Student::Student() : name("NoName"), birthday(myDate()){};  //添加,不带参数
+     Student::Student(string n) : name(n), birthday(myDate()){}; //添加,带一个参数
+     
+     //类体外定义成员函数
+     Student::Student(const Student &s) //自定义复制构造函数
+     {
+       name = "Copy" + s.name;
+       birthday = s.birthday;
+     }
+     void Student::setStudent(string s, myDate d)
+     {
+       name = s;
+       birthday.setDate(d);
+       return;
+     }
+     void Student::setName(string n)
+     {
+       name = n;
+       return;
+     }
+     string Student::getName()
+     {
+       return name;
+     }
+     void Student::setBirthday(myDate d)
+     {
+       birthday.setDate(d);
+       return;
+     }
+     myDate Student::getBirthday()
+     {
+       return birthday;
+     }
+     void Student::printStudent() const
+     {
+       cout << "姓名:" << name << "\t生日:";
+       birthday.printDate(); //调用类myDate 的成员函数
+       cout << endl;
+     }
+     
+     int main()
+     {
+       Student stud;
+       stud.setName("444"); //姓名改为444
+       Student ss[2] = {stud, Student()};
+       stud.printStudent();
+       stud.setName("111");
+       ss[0] = Student(stud); //调用复制构造函数
+       ss[1] = Student();
+       stud.printStudent();
+       ss[0].printStudent(); //姓名 Copy111
+       ss[1].printStudent(); //默认新对象
+       return 0;
+     }
+     ```
+
+   - 自动调用复制函数的三种情况
+
+     1. 用一个对象去初始化本类另一个对象
+
+        ```C++
+        类名 对象名2(对象名1);
+        类名 对象名2 = 对象名1;
+        ```
+
+     2. 函数F 的参数是类A 的对象, 调用F 时, 会调用类 A 的复制构造函数
+
+     3. 函数返回值是类A 的对象, 函数返回时会调用类 A 的复制构造函数
+
+     注意: 复制构造函数的参数表中加上 const
+
+   **类型转换构造函数**
+
+   - 如果构造函数只有一个参数, 则可以看做类型转换构造函数, 作用是进行类型自动转换
+
+   - ```C++
+     #include <iostream>
+     #include <string>
+     using namespace std;
+     class Demo
+     {
+       int id;
+     
+     public:
+       Demo(int i)
+       {
+         id = i;
+         cout << "id=" << id << "构造函数" << endl;
+       }
+       void printDemo();
+       ~Demo()
+       {
+         cout << "id=" << id << "析构函数" << endl; //下节介绍
+       }
+     };
+     void Demo::printDemo()
+     {
+       cout << "id=" << id << endl;
+     }
+     int main()
+     {
+       Demo d4(4); //主函数内定义
+       d4.printDemo();
+       d4 = 6; //可看作是将整型数6 转为Demo 对象
+       d4.printDemo();
+       return 0;
+     }
+     ```
+
+     
 
 ## 第二节 析构函数
 
-- 
+- 成员函数的一种
+
+  - 名字与类名相同
+  - 类名前加 `~`
+  - 无参数, 无返回值
+  - 一个类仅有一个
+  - 没有定义则自动生成
+
+- 用于释放内存
+
+- 对象数组与 delete 语句
+
+  ```C++
+  Student *ss = new Student[2];
+  delete []ss;
+  ```
+
+- 指针数组与 delete 语句
+
+  ```C++
+  Student *ss[2] = {new Student(),new Student()};
+  delete ss[0];
+  delete ss[1];
+  ```
+
+- 程序填空题
+
+  ```C++
+  #include <iostream>
+  #include <string>
+  using namespace std;
+  class Samp
+  {
+  public:
+    void Setij(int a, int b)
+    {
+      i = a;
+      j = b;
+      cout << "i=" << i << "构造函数" << endl;
+    }
+    void printDemo();
+    ~Samp()
+    {
+      cout << "i=" << i << "析构函数" << endl;
+    }
+    int GetMuti()
+    {
+      return i * j;
+    }
+  
+  protected:
+    int i;
+    int j;
+  };
+  
+  int main()
+  {
+    Samp *p;
+    p = new Samp[5];
+    if (!p)
+    {
+      cout << "内存分配错误\n";
+      return 1;
+    }
+    for (int j = 0; j < 5; j++)
+  
+      p[j].Setij(j, j);
+    for (int k = 0; k < 5; k++)
+      cout << "Muti[" << k << "] 值是:" << p[k].GetMuti() << endl;
+    delete[] p;
+  
+    return 0;
+  }
+  ```
+
+  
 
 ## 第三节 类的静态成员
 
 1. 静态变量
+
+   - static 
+
+     - 静态全局变量
+     - 静态局部变量
+
+   - 拥有全局生命周期, 初始值为0
+
+   - 自动变量和静态变量的使用
+
+     ```C++
+     #include <iostream>
+     #include <string>
+     using namespace std;
+     static int glos = 100;
+     void f()
+     {
+       int a = 1;
+       static int fs = 1;
+       cout << "在f中:a(自动变量)=" << a << " fs(静态)" << fs << " glos(静态)=" << glos << endl;
+       a += 2;
+       fs += 2;
+       glos += 10;
+       cout << "在f中:a(自动变量)=" << a << " fs(静态)" << fs << " glos(静态)=" << glos << endl
+            << endl;
+     }
+     int main()
+     {
+       static int ms = 10;
+       for (int i = 1; i <= 3; i++)
+         f();
+       cout << "ms=" << ms << endl;
+       cout << "glos=" << glos << endl;
+       return 0;
+     }
+     ```
+
+     
+
 2. 类的静态成员
+
+   - 静态成员变量
+
+     - 在类定义中声明静态成员变量, 必须在类外定义成员静态变量的初值
+     - `类型 类名::静态成员变量 = 初值;` 前面不加 static 
+
+   - 静态成员函数
+
+     - 类的静态成员函数没有 this 指针, 不能再静态成员函数内访问非静态成员
+     - **静态成员函数只能处理静态成员变量**
+
+   - 类的静态成员被类的所有成员共享
+
+   - 访问静态成员
+
+     - `类名::静态成员名`
+     - `对象名.静态成员名`
+     - `对象指针->静态成员名`
+
+   - 静态成员的使用
+
+     - ```
+       
+       ```
+
+       
+
+   - 程序填空题
+
+     - ```C++
+       #include <iostream>
+       #include <string>
+       using namespace std;
+       class Test
+       {
+       public:
+         static int x;
+         Test(int i = 10)
+         {
+           x = i + x;
+         }
+         int Getnum()
+         {
+           return Test::x + 7;
+         }
+       };
+       int Test::x = 83;
+       int main()
+       {
+         Test test;
+         cout << test.Getnum() << endl;
+         return 0;
+       }
+       ```
+
+       
 
 ## 第四节 变量及对象的生存期和作用域
 
 1. 变量的生存期和作用域
+
+   - 生存期
+
+     - 分配内存到释放内存
+
+   - 作用域
+
+     -  变量的有效范围
+     - 全局域
+       - 程序作用域
+         - 多文件作用域, extern 说明的外部变量和外部函数
+       - 文件作用域
+         - 单文件作用域, 文件内函数外的变量/函数
+     - 局部域
+       - 类作用域
+       - 函数作用域
+       - 块作用域
+       - 函数原型作用域
+         - 不是定义函数, 而是声明函数, 函数原型形参作用域只在声明中
+         - 所以通常只要声明形参的个数和类型, 省略参数名
+
+   - 程序中出现的左右标识符都必须说明
+
+     ```
+     
+     ```
+
+     
+
 2. 类对象的生存期和作用域
+
+   - 类对象生成时调用构造函数, 销毁时调用析构函数
+   - 作用域越大的越晚销毁
+
+
 
 ## 第五节 常量成员和常引用成员
 
-- 
+- 使用 const 修饰的量称为常量
+
+  - 常量函数
+  - 常量对象
+  - 常量成员变量
+
+- 格式
+
+  - 常量对象/常量成员变量
+    - `const 数据类型 常量名 = 表达式;`
+  - 常量函数
+    - `类型说明符 函数名(参数表) const;`
+
+- 都可以调用静态成员函数
+
+  - 常量成员变量及常量成员函数的使用
+
+    ```C++
+    #include <iostream>
+    #include <string>
+    using namespace std;
+    class constClass
+    {
+      const int conMbr; //类中的常量成员变量
+      int Mbr;          //普通成员变量
+    
+    public:
+      constClass() : conMbr(0), Mbr(100) {} //初始化列表处给初始值
+      constClass(int i) : conMbr(i)         //初始化列表处给初始值
+      {
+        Mbr = 200;
+      }
+      void printConst()
+      {
+        cout << "conMbr=" << conMbr << ",Mbr" << Mbr << endl;
+      }
+      int getConst()
+      {
+        cout << "调用非常量函数" << endl;
+        return conMbr;
+      }
+      int getConst() const
+      {
+        cout << "调用常量函数" << endl;
+        return conMbr;
+      }
+      int getValue()
+      {
+        return Mbr;
+      }
+      void processConst()
+      {
+        cout << "--在processConst函数中 非常量--" << endl;
+        int x = 2 * conMbr + 1;
+        cout << "x=2*conMbr+1=" << x << endl; //可以读取 conMbr
+        //conMbr++; //错误, 不能更改常量成员变量 conMbr的值
+        Mbr++; //可以修改非常量成员 Mbr的值
+        cout << "Mbr=" << Mbr << endl;
+      }
+      void processConst() const
+      {
+        cout << "--在processConst函数中 常量--" << endl;
+        int x = conMbr + 1;
+        cout << "x=conMbr+1=" << x << endl; //可以读取 conMbr
+        //conMbr++; //错误, 不能更改常量成员变量 conMbr的值
+        // Mbr++; //不能修改非常量成员 Mbr的值
+        cout << "Mbr=" << Mbr << endl;
+      }
+    };
+    
+    int main()
+    {
+      constClass ob1(123), ob2;
+      ob1.printConst();
+      cout << "ob2.getConst()=" << ob2.getConst() << endl;
+      ob2.processConst();
+      const constClass ob3(20);
+      cout << "ob3.getConst()=" << ob3.getConst() << endl;
+      ob3.processConst();
+      return 0;
+    }
+    ```
+
+    
+
+
 
 ## 第六节 成员对象和封闭类
 
+- 一个类的成员变量如果是另一个类的对象, 称该变量为“成员对象”, 这两个类为**包含关系**; 包含成员对象的类叫做封闭类
+
 1. 封闭类构造函数和初始化列表
+
+   - 定义封闭类的的构造函数时, 需要添加初始化列表, 指明要调用成员对象的那个构造函数
+   - 先执行成员变量的构造函数; 销毁时先执行封闭类析构函数, 在执行成员对象的析构函数
+   - 添加初始化列表格式
+     - `封闭类名::构造函数名(参数表):成员变量1(参数表),成员变量2(参数表),... {...}`
+
 2. **封闭类的复制构造函数**
+
+   - 如果封闭类的**对象是用默认复制构造函数初始化**的, 那么它**包含的成员对象**也会用复制构造函数初始化
+
+   - ```C++
+     #include <iostream>
+     using namespace std;
+     class A
+     {
+     public:
+       A()
+       {
+         cout << "default" << endl;
+       }
+       A(A &a)
+       {
+         cout << "copy" << endl;
+       }
+     };
+     
+     class B
+     {
+       A a;
+     };
+     
+     main()
+     {
+       B b1, b2(b1);
+       return 0;
+     }
+     ```
+
+     
+
+
 
 ## 第七节 友元
 
 1. 友元
+
+   -  兼顾C 语言程序设计的习惯与 C++ 信息隐藏的特点, 而增加的功能
+   - 是一种类成员的访问权限
+     - 破坏了类的封装性和信息隐藏, 但有助于数据共享, 能够提高程序运行效率
+   - `friend`
+
 2. 友元函数
+
+   - 全局函数声明为本类友元函数的格式如下
+
+     - `friend 返回值类型 函数名(参数表);`
+
+   - 有某类A 定义后, 将类 A 的成员函数说明为友元函数的格式如下
+
+     - `friend 返回值类型 类A::类A的成员函数名(参数名);`
+     - 不能把其他类的私有成员函数声明为友元函数
+
+   - 友元函数不是类的成员函数,但允许访问类的所有成员
+
+     - 在函数体中访问对象成员
+       - `对象名.对象成员名`
+     - 不受访问权限关键词限制
+
+   - 类成员函数实现复数类操作
+
+     - ```
+       
+       ```
+
+   - 友元函数实现复数操作
+
+     - ```
+       
+       ```
+
+       
+
 3. 友元类
+
+   - `friend class 类名;`
+
+   - 类友元关系是单向的, 不能传递, 非必要时不用类友元
+
+   - 类友元示例
+
+     - ```
+       
+       ```
+
+   - 程序填空题
+
+     - ```C++
+       #include <iostream>
+       #include <cmath>
+       using namespace std;
+       class Point
+       {
+       private:
+         double x, y;
+         friend class Line;
+       
+       public:
+         Point(double i = 0, double j = 0)
+         {
+           x = i;
+           y = j;
+         }
+         Point(Point &p)
+         {
+           x = p.x;
+           y = p.y;
+         }
+       };
+       
+       class Line
+       {
+       private:
+         Point p1, p2;
+       
+       public:
+         Line(Point &xp1, Point &xp2) : p1(xp1), p2(xp2) {}
+         double GetLength();
+       };
+       
+       double Line::GetLength()
+       {
+         double dx = p2.x - p1.x;
+         double dy = p2.y - p1.y;
+         return sqrt(dx * dx + dy * dy);
+       }
+       
+       main()
+       {
+         Point p1, p2(6, 8);
+         Line L1(p1, p2);
+         cout << L1.GetLength() << endl;
+         return 0;
+       }
+       ```
+
+       
+
+
 
 ## 第八节 this 指针
 
-- 
+- 被调用函数的内存首地址
+
+- 指向对象
+
+  - `this ->成员变量 = 形参;`
+
+- this 指针的使用
+
+  - ```
+    
+    ```
+
+    
 
 
 
