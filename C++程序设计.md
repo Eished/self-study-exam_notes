@@ -1674,14 +1674,98 @@ using namespace std;
 
    - 类成员函数实现复数类操作
 
-     - ```
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         myComplex addCom(myComplex c); //成员函数, 调用者对象与参数对象c相加
+         void outCom();                 //成员函数, 输出调用者对象的有关数据
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       myComplex myComplex::addCom(myComplex c)
+       {
+         return myComplex(real + c.real, imag + c.imag);
+       }
+       void myComplex::outCom()
+       {
+         cout << "(" << real << "," << imag << ")";
+       }
        
+       main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         res = c1.addCom(c2); //调用成员函数必须通过类对象
+         c1.outCom();
+         cout << "+";
+         c2.outCom();
+         cout << "=";
+         res.outCom();
+         cout << endl;
+         return 0;
+       }
        ```
 
    - 友元函数实现复数操作
 
-     - ```
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         friend myComplex addCom(myComplex c1, myComplex c2); //友元函数, 两个参数对象相加
+         friend void outCom(myComplex c);                     //友元函数, 输惨参数对象数据
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       myComplex addCom(myComplex c1, myComplex c2) //定义函数
+       {
+         return myComplex(c1.real + c2.real, c1.imag + c2.imag);
+       }
+       void outCom(myComplex c) //定义函数
+       {
+         cout << "(" << c.real << "," << c.imag << ")";
+       }
        
+       main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         res = addCom(c1, c2); //调用成员函数必须通过类对象
+         outCom(c1);
+         cout << "+";
+         outCom(c2);
+         cout << "=";
+         outCom(res);
+         cout << endl;
+         return 0;
+       }
        ```
 
        
@@ -1694,8 +1778,56 @@ using namespace std;
 
    - 类友元示例
 
-     - ```
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         friend class oper; //友元类
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       class oper
+       {
+       public:
+         myComplex addCom(myComplex c1, myComplex c2); //友元函数, 两个参数对象相加
+         void outCom(myComplex c);                     //友元函数, 输惨参数对象数据
+       };
+       myComplex oper::addCom(myComplex c1, myComplex c2) //定义函数
+       {
+         return myComplex(c1.real + c2.real, c1.imag + c2.imag);
+       }
+       void oper::outCom(myComplex c) //定义函数
+       {
+         cout << "(" << c.real << "," << c.imag << ")";
+       }
        
+       main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         oper o;
+         res = o.addCom(c1, c2); //调用成员函数必须通过类对象
+         o.outCom(c1);
+         cout << "+";
+         o.outCom(c2);
+         cout << "=";
+         o.outCom(res);
+         cout << endl;
+         return 0;
+       }
        ```
 
    - 程序填空题
@@ -1763,8 +1895,55 @@ using namespace std;
 
 - this 指针的使用
 
-  - ```
+  - ```C++
+    #include <iostream>
+    using namespace std;
+    class myComplex
+    {
+    public:
+      double real, imag;
+      myComplex() : real(0), imag(0) {}
+      myComplex(double, double);
+      myComplex AddRealOne();
+      myComplex AddImagOne();
+      void outCom(); //成员函数, 输出调用者对象的有关数据
+    };
+    myComplex::myComplex(double real, double imag)
+    {
+      this->real = real;
+      this->imag = imag;
+    }
+    void myComplex::outCom()
+    {
+      cout << "(" << real << "," << imag << ")";
+    }
+    myComplex myComplex::AddRealOne()
+    {
+      this->real++;
+      return *this; // 返回对象本身
+    }
+    myComplex myComplex::AddImagOne()
+    {
+      this->imag++;
+      return *this; // 返回对象本身
+    }
     
+    main()
+    {
+      myComplex c1(1, 1), c2, c3;
+      c1.outCom();
+      c2.outCom();
+      c3.outCom();
+      cout << endl
+           << "分界线" << endl;
+      c2 = c1.AddRealOne();
+      c1.outCom();
+      c3 = c1.AddImagOne();
+      c2.outCom();
+      c3.outCom();
+      cout << endl;
+      return 0;
+    }
     ```
 
     
