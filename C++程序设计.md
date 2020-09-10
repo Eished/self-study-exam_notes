@@ -25,7 +25,7 @@
 
   - 解决utf-8中文乱码问题, 在vs code修改代码的打开和保存方式
 
-    直接就将代码保存为gb2312。在vs code右下角可以看到当前文件编码方式，点击utf-8修改打开和保存方式为gb2312。
+    直接就将代码保存为 gb2312。在vs code右下角可以看到当前文件编码方式，点击utf-8修改打开和保存方式为 gb2312。
 
   - VScode 执行完会自动关闭终端, return 前设置断点
 
@@ -1635,7 +1635,7 @@ using namespace std;
        A a;
      };
      
-     main()
+     int main()
      {
        B b1, b2(b1);
        return 0;
@@ -1706,7 +1706,7 @@ using namespace std;
          cout << "(" << real << "," << imag << ")";
        }
        
-       main()
+       int main()
        {
          myComplex c1(1, 2), c2(3, 4), res;
          res = c1.addCom(c2); //调用成员函数必须通过类对象
@@ -1754,7 +1754,7 @@ using namespace std;
          cout << "(" << c.real << "," << c.imag << ")";
        }
        
-       main()
+       int main()
        {
          myComplex c1(1, 2), c2(3, 4), res;
          res = addCom(c1, c2); //调用成员函数必须通过类对象
@@ -1815,7 +1815,7 @@ using namespace std;
          cout << "(" << c.real << "," << c.imag << ")";
        }
        
-       main()
+       int main()
        {
          myComplex c1(1, 2), c2(3, 4), res;
          oper o;
@@ -1872,7 +1872,7 @@ using namespace std;
          return sqrt(dx * dx + dy * dy);
        }
        
-       main()
+       int main()
        {
          Point p1, p2(6, 8);
          Line L1(p1, p2);
@@ -1928,7 +1928,7 @@ using namespace std;
       return *this; // 返回对象本身
     }
     
-    main()
+    int main()
     {
       myComplex c1(1, 1), c2, c3;
       c1.outCom();
@@ -1961,24 +1961,688 @@ using namespace std;
 ## 第一节 运算符重载的概念
 
 1. 重载运算符的概念
+
+   - 已有的运算符赋予多重含义, 使同一个运算符作用于不同类型的数据时产生不同的行为
+
+   - 可重载的运算符
+
+     - | 运算符         | 举例                                                         |
+       | -------------- | ------------------------------------------------------------ |
+       | 双目算术运算符 | `+, -, *, /, %`                                              |
+       | 关系运算符     | `==, !=, <, >, <=, >=`                                       |
+       | 逻辑运算符     | `||, &&, !`                                                  |
+       | 单目运算符     | `+(正), -(负), *(指针), &(取地址)`                           |
+       | 自增自减运算符 | `++, --`                                                     |
+       | 位运算符       | `|(按位或), &(按位与), ~(按位取反), ^(按位异或), <<(左移), >>(右移)` |
+       | 赋值运算符     | `=, +=, -=, *=, /=, %=, &=(按位与赋值), |=(按位或赋值), ^=(按位异反赋值), <<=(左移赋值), >>=(右移赋值)` |
+       | 空间申请与释放 | `new, delete, new[], delete[]`                               |
+       | 其他运算符     | `()(函数调用), ->(成员访问), ,(逗号), [](下标)`              |
+
+   - 不可重载的运算符和符号
+
+     - | 成员访问运算符     | `.`       |
+       | ------------------ | --------- |
+       | 成员指针访问运算符 | `.* , ->` |
+       | 域运算符           | `::`      |
+       | 长度运算符         | `sizeof`  |
+       | 条件运算符         | `?:`      |
+       | 预处理符号         | `#`       |
+
+   - 用于类运算的运算符通常都要重载, 系统提供了两个重载运算符
+
+     - `=, &` 复制和地址
+
+   - 运算符重载的实质是编写以运算符为名称的函数
+
+     - 使用运算符的表达式就被解释为对重载函数的调用
+     - `返回值类型 operator 运算符(形参表){函数体}`
+     - 可以是全局函数, 成员函数
+
+   
+
 2. 重载运算符为类的成员函数
+
+   - 使用重载运算符
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         myComplex addCom(myComplex c);                                        //成员函数, 调用者对象与参数对象c相加
+         void outCom();                                                        //成员函数, 输出调用者对象的有关数据
+         myComplex operator-(const myComplex &c);                              //成员 重载函数
+         friend myComplex operator+(const myComplex &c1, const myComplex &c2); //友元 重载函数
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       myComplex myComplex::addCom(myComplex c)
+       {
+         return myComplex(real + c.real, imag + c.imag);
+       }
+       void myComplex::outCom()
+       {
+         cout << "(" << real << "," << imag << ")";
+       }
+       myComplex myComplex::operator-(const myComplex &c)
+       {
+         return myComplex(this->real - c.real, this->imag - c.imag); //返回一个临时对象
+       }
+       myComplex operator+(const myComplex &c1, const myComplex &c2)
+       {
+         return myComplex(c1.real + c2.real, c1.imag + c2.imag); //返回一个临时对象
+       }
+       
+       int main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         c1.outCom();
+         cout << "operator+";
+         c2.outCom();
+         cout << "=";
+         res = c1 + c2;
+         res.outCom();
+         cout << endl;
+         c1.outCom();
+         cout << "operator-";
+         c2.outCom();
+         cout << "=";
+         res = c1 - c2;
+         res.outCom();
+         cout << endl;
+         return 0;
+       }
+       ```
+
+       
+
 3. 重载运算符为友元函数
+
+   - 重载运算符作为友元函数时, 两个操作参数都要列出
+
+   - 重载为友元函数
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         myComplex addCom(myComplex c);                                        //成员函数, 调用者对象与参数对象c相加
+         void outCom();                                                        //成员函数, 输出调用者对象的有关数据
+         myComplex operator-(const myComplex &c);                              //成员 重载函数
+         friend myComplex operator+(const myComplex &c1, const myComplex &c2); //友元 重载函数
+         friend myComplex operator-(const myComplex &c1, const myComplex &c2); //友元 重载函数
+         friend myComplex operator-(const myComplex &c1, double r);            //友元 重载函数
+         friend myComplex operator-(double r, const myComplex &c1);            //友元 重载函数
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       myComplex myComplex::addCom(myComplex c)
+       {
+         return myComplex(real + c.real, imag + c.imag);
+       }
+       void myComplex::outCom()
+       {
+         cout << "(" << real << "," << imag << ")";
+       }
+       myComplex myComplex::operator-(const myComplex &c)
+       {
+         return myComplex(this->real - c.real, this->imag - c.imag); //返回一个临时对象
+       }
+       myComplex operator+(const myComplex &c1, const myComplex &c2) //c1+c2
+       {
+         return myComplex(c1.real + c2.real, c1.imag + c2.imag); //返回一个临时对象
+       }
+       myComplex operator-(const myComplex &c1, const myComplex &c2) //c1-c2
+       {
+         return myComplex(c1.real - c2.real, c1.imag - c2.imag); //返回一个临时对象
+       }
+       myComplex operator-(const myComplex &c1, double r) //c1-r
+       {
+         return myComplex(c1.real - r, c1.imag); //返回一个临时对象
+       }
+       myComplex operator-(double r, const myComplex &c1) //r-c1
+       {
+         return myComplex(r + c1.real, -c1.imag); //返回一个临时对象
+       }
+       
+       int main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         c1.outCom();
+         cout << "operator+";
+         c2.outCom();
+         cout << "=";
+         res = c1 + c2;
+         res.outCom();
+         cout << endl;
+         c1.outCom();
+         cout << "operator-";
+         c2.outCom();
+         cout << "=";
+         res = c1 - c2;
+         res.outCom();
+         cout << endl;
+         res = c1 - c2;
+         res.outCom();
+         res = c1 - 5;
+         res.outCom();
+         res = 5 - c1;
+         res.outCom();
+         return 0;
+       }
+       ```
+
+       
+
 4. 重载运算符的规则
+
+   1. 重载后含义应符合原有用法习惯
+   2. 不能改变原有的语义, 包括优先级和结合性
+   3. 不能改变运算符操作的个数和语法结构
+   4. 不能创建新的运算符
+   5. `(), [], ->, =` 只能重载为成员函数, 不能重载为全局函数
+   6. 不能改变该运算符用于基本数据类型对象的含义
+
+
 
 ## 第二节 重载赋值运算符
 
 1. 重载赋值运算符
+
+   - `=` 只能重载为成员函数
+
+   - 重载后被解释为函数调用的形式
+
+     - `s1.operator = (s2);`
+
+   - 为类 myComplex 重载赋值运算符
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class myComplex //复数类
+       {
+       private:
+         double real, imag; //复数的实部和虚部
+       public:
+         myComplex();
+         myComplex(double r, double i);
+         ~myComplex() {}                                                       //不能有分号
+         myComplex addCom(myComplex c1);                                       //成员函数, 调用者对象与参数对象c相加
+         void outCom();                                                        //成员函数, 输出调用者对象的有关数据
+         void outCom(string s);                                                //成员函数, 输出调用者对象的有关数据
+         void changeReal(double r);                                            //成员函数
+         myComplex operator-(const myComplex &c);                              //成员 重载函数
+         friend myComplex operator+(const myComplex &c1, const myComplex &c2); //友元 重载函数 c1+c2
+         friend myComplex operator+(const myComplex &c1, double r);            //友元 重载函数 c1+r
+         friend myComplex operator+(double r, const myComplex &c1);            //友元 重载函数 r+c1
+         friend myComplex operator-(const myComplex &c1, const myComplex &c2); //友元 重载函数
+         friend myComplex operator-(const myComplex &c1, double r);            //友元 重载函数
+         friend myComplex operator-(double r, const myComplex &c1);            //友元 重载函数
+         myComplex &operator=(const myComplex &c);                             //成员函数
+         myComplex &operator=(double);                                         //成员函数
+       };
+       myComplex::myComplex(double r, double i)
+       {
+         real = r;
+         imag = i;
+       }
+       myComplex::myComplex()
+       {
+         real = 0;
+         imag = 0;
+       }
+       myComplex myComplex::addCom(myComplex c1)
+       {
+         return myComplex(this->real + c1.real, this->imag + c1.imag);
+       }
+       void myComplex::outCom()
+       {
+         cout << "(" << real << "," << imag << ")";
+       }
+       void myComplex::outCom(string s)
+       {
+         cout << s << "(" << real << "," << imag << ")" << endl;
+       }
+       void myComplex::changeReal(double r)
+       {
+         this->real = r;
+       }
+       // myComplex myComplex::operator-(const myComplex &c)
+       // {
+       //   return myComplex(this->real - c.real, this->imag - c.imag); //返回一个临时对象
+       // }
+       myComplex operator+(const myComplex &c1, const myComplex &c2) //c1+c2
+       {
+         return myComplex(c1.real + c2.real, c1.imag + c2.imag); //返回一个临时对象
+       }
+       myComplex operator+(const myComplex &c1, double r) //c1+r
+       {
+         return myComplex(c1.real + r, c1.imag); //返回一个临时对象
+       }
+       myComplex operator+(double r, const myComplex &c1) //r+c2
+       {
+         return myComplex(r + c1.real, c1.imag); //返回一个临时对象
+       }
+       myComplex operator-(const myComplex &c1, const myComplex &c2) //c1-c2
+       {
+         return myComplex(c1.real - c2.real, c1.imag - c2.imag); //返回一个临时对象
+       }
+       myComplex operator-(const myComplex &c1, double r) //c1-r
+       {
+         return myComplex(c1.real - r, c1.imag); //返回一个临时对象
+       }
+       myComplex operator-(double r, const myComplex &c1) //r-c1
+       {
+         return myComplex(r + c1.real, -c1.imag); //返回一个临时对象
+       }
+       myComplex &myComplex::operator=(const myComplex &c1)
+       {
+         this->real = c1.real;
+         this->imag = c1.imag;
+         return *this;
+       }
+       myComplex &myComplex::operator=(double r)
+       {
+         this->real = r;
+         this->imag = 0;
+         return *this;
+       }
+       
+       int main()
+       {
+         myComplex c1(1, 2), c2(3, 4), res;
+         c1.outCom("\t\t\tc1");
+         c2.outCom("\t\t\tc2");
+         res = c1 + c2;
+         res.outCom("执行 res = c1 + c2 →\tres");
+         res = c1.addCom(c2);
+         res.outCom("执行 res = c1.addCom(c2) →\tres");
+         res = c1 + 5;
+         res.outCom("执行 res = c1 + 5 →\tres");
+         res = 5 + c1;
+         res.outCom("执行 res = 5 + c1 →\tres");
+         res = c1;
+         c1.outCom("\t\t\tc1");
+         res.outCom("执行 res = c1 →\tres");
+         c1.changeReal(-3);
+         c1.outCom("执行 changeReal(-3) →\tc1");
+         res.outCom("\t\t\tres");
+         res = c1;
+         res.outCom("res = c1 →\tres");
+         res = 7;
+         res.outCom("res = 7 →\tres");
+         res = 7 + 8;
+         res.outCom("res = 7 + 8; →\tres");
+         res = c1 = c2;
+         c1.outCom("\t\t\tc1");
+         c2.outCom("\t\t\tc2");
+         res.outCom("res = c1 = c2 →\tres");
+       
+         return 0;
+       }
+       ```
+
+       
+
 2. 浅拷贝和深拷贝
+
+   - 浅拷贝
+     - 赋值号左侧对象的值一一赋值给左侧对象
+     - 如果值得对象涉及指针或引用, 它们之间值相互关联, 因为指向同一个内存地址
+   - 深拷贝
+     - 重载赋值运算符后, 赋值语句是将一个对象中指针成员变量指向内容复制到另一个对象中指针成员变量指向的地方
+     - `delete 指针;` 释放原指针的内存再保存到新的指针指向的内存地址
+
+
 
 ## 第三节 重载流插入运算符和流提取运算符
 
-- 
+- 流插入运算符
+
+  - 左移运算符 `<<` 和 `cout` 一起用于输出, 称为 “流插入运算符”
+
+- 流提取运算符
+
+  - 左移运算符 `>>` 和 `cin` 一起用于输出, 称为 “流插入运算符”
+
+- C++ 类库提供的头文件对 `<<` `>>` 进行了重载
+
+  - `cout <<` 是 `ostream` 的对象
+  - `cin >>` 是 `istream` 的对象
+  - 在头文件 `iostream` 中声明, 所以要用 `#include<iostream>`
+
+- 重载流运算符
+
+  - 操作符右边是流对象的别名, 不是操作对象
+
+    - 运算符接在流对象后面, 直接访问类的私有数据
+    - 流只能继承不能修改, 重载函数不能是流类库中的成员, 必须重载为类的友元
+
+  - 重载流插入运算符
+
+    ```C++
+    ostream &operator<<(ostream & output, 类名&对象名)
+    {
+    	... 
+    	return output;
+    }
+    ```
+
+  - 重载流提取运算符
+
+    ```C++
+    istream &operator<<(istream & input, 类名&对象名)
+    {
+    	... 
+    	return input;
+    }
+    ```
+
+    - `input`是 `istream` 对象的引用, 是 `cin`  的别名: `istream & input = cin;`
+
+  - 流插入运算符和流提取运算符重载为友元
+
+    - ```C++
+      #include <iostream>
+      #include <cstdlib>
+      #include <string>
+      using namespace std;
+      class myComplex
+      {
+      private:
+        double real, imag;
+      
+      public:
+        myComplex() : real(0), imag(0) {}
+        myComplex(double r, double i) : real(r), imag(i) {}
+        friend ostream &operator<<(ostream &os, const myComplex &c); //友元,插入
+        friend istream &operator>>(istream &is, myComplex &c);       //友元,提取
+      };
+      ostream &operator<<(ostream &os, const myComplex &c)
+      {
+        if (c.imag >= 0)
+        {
+          os << c.real << "+" << c.imag << "i"; //以 a+bi 的形式输入
+        }
+        else
+        {
+          os << c.real << "-" << -c.imag << "i";
+        }
+        return os;
+      }
+      istream &operator>>(istream &is, myComplex &c)
+      {
+        string s;
+        is >> s;                  //将a+bi 作为字符串读入,a+bi中间不能有空格
+        int pos = s.find("+", 0); //查找虚部
+        if (pos == -1)
+          pos = s.find("-", 1);                      //虚部为负数时
+        string sReal = s.substr(0, pos);             //分离出代表实部的字符串
+        c.real = atof(sReal.c_str());                //atof() 能将参数内容转换成浮点数
+        sReal = s.substr(pos, s.length() - pos - 1); //分离出代表虚部的字符串
+        c.imag = atof(sReal.c_str());
+        return is;
+      }
+      int main()
+      {
+        myComplex c, c1;
+        int n;
+        cout << "请输入两个复数([-]a±bi)和一个整数, 以空格分隔" << endl;
+        cin >> c >> c1 >> n;
+        cout << c << "," << n << "," << c1;
+        return 0;
+      }
+      ```
+
+      
+
+  - 流插入运算符重载为成员函数
+
+    - ```C++
+      #include <iostream>
+      #include <cstdlib>
+      #include <string>
+      using namespace std;
+      class myComplex
+      {
+      private:
+        double real, imag;
+      
+      public:
+        myComplex() : real(0), imag(0) {}
+        myComplex(double r, double i) : real(r), imag(i) {}
+        ostream &operator<<(ostream &os);                      //成员函数 ,插入
+        friend istream &operator>>(istream &is, myComplex &c); //友元,提取
+      };
+      ostream &myComplex::operator<<(ostream &os)
+      {
+        if (this->imag >= 0)
+        {
+          os << this->real << "+" << this->imag << "i"; //以 a+bi 的形式输入
+        }
+        else
+        {
+          os << this->real << "-" << -this->imag << "i";
+        }
+        return os;
+      }
+      istream &operator>>(istream &is, myComplex &c)
+      {
+        string s;
+        is >> s;                  //将a+bi 作为字符串读入,a+bi中间不能有空格
+        int pos = s.find("+", 0); //查找虚部
+        if (pos == -1)
+          pos = s.find("-", 1);                      //虚部为负数时
+        string sReal = s.substr(0, pos);             //分离出代表实部的字符串
+        c.real = atof(sReal.c_str());                //atof() 能将参数内容转换成浮点数
+        sReal = s.substr(pos, s.length() - pos - 1); //分离出代表虚部的字符串
+        c.imag = atof(sReal.c_str());
+        return is;
+      }
+      
+      int main()
+      {
+        myComplex c, c1;
+        int n;
+        cout << "请输入两个复数([-]a±bi)和一个整数, 以空格分隔" << endl;
+        cin >> c >> c1 >> n;
+        c1 << (c << cout << ",") << "," << n; //注意调用形式
+        return 0;
+      }
+      ```
+
+      
+
+
 
 ## 第四节 重载强制类型转换运算符 (重要)
 
-- 
+- 类的名字本身也是运算符, 强制类型转换运算符
 
-## 第五节 重载自增、自建运算符
+  - 是单目运算符, 也可以重载, 但只能重载为成员函数, 不能重载为全局函数
+
+  - `类型名 对象` 重载后等价于 `对象.operator 类型名()`
+
+  - 重载强制类型转换运算符 double
+
+    - ```C++
+      #include <iostream>
+      #include <cstdlib>
+      #include <string>
+      using namespace std;
+      class myComplex
+      {
+      private:
+        double real, imag;
+      
+      public:
+        myComplex(double r = 0, double i = 0) : real(r), imag(i){}; //内联成员函数
+        operator double()                                           //重载强制类型转换运算符 double
+        {
+          return real;
+        }
+      };
+      
+      int main()
+      {
+        myComplex c(1.2, -3.4);
+        cout << (double)c << endl; // c.operator double() 输出1.2
+        double n = 12 + c; //等价于 double n=12+c.operator double()
+        cout << n;
+        return 0;
+      }
+      ```
+
+      
+
+
+
+## 第五节 重载自增、自减运算符
+
+- 有前置 后置之分
+
+  - 允许写一个增加无用int 类型形参的版本, 处理前置时调用参数个数正常的重载函数
+  - 处理后置 表达式时, 调用多出一个参数的重载函数
+
+- 自增作为成员函数 自减作为友元
+
+  - ```C++
+    #include <iostream>
+    using namespace std;
+    class Demo
+    {
+    private:
+      int n;
+    
+    public:
+      Demo(int i = 0) : n(i) {}
+      Demo &operator++();   //用于前置
+      Demo operator++(int); //用于后置
+      operator int() { return n; }
+      friend Demo &operator--(Demo &);
+      friend Demo operator--(Demo &, int);
+    };
+    Demo &Demo::operator++() //前置++
+    {
+      n++;
+      return *this;
+    }
+    Demo Demo::operator++(int k) //后置++
+    {
+      Demo tmp(*this); //记录修改前的对象
+      n++;
+      return tmp; //返回修改前对象
+    }
+    Demo &operator--(Demo &d) //前置--
+    {
+      d.n--;
+      return d;
+    }
+    Demo operator--(Demo &d, int) //后置--
+    {
+      Demo tmp(d);
+      d.n--;
+      return tmp;
+    }
+    int main()
+    {
+      Demo d(10);
+      cout << (d++) << ","; // d.operator++(0)
+      cout << d << ",";
+      cout << (++d) << ","; // d.operator++()
+      cout << d << ",";
+      cout << (d--) << ","; // d.operator--(d,0)
+      cout << d << ",";
+      cout << (--d) << ","; // d.operator--(d)
+      cout << d << ",";
+      return 0;
+    }
+    ```
+
+- 都作为成员函数
+
+  - ```C++
+    #include <iostream>
+    using namespace std;
+    class Demo
+    {
+    private:
+      int n;
+    
+    public:
+      Demo(int i = 0) : n(i) {}
+      Demo &operator++();   //用于前置
+      Demo operator++(int); //用于后置
+      operator int() { return n; }
+      Demo &operator--();
+      Demo operator--(int);
+    };
+    Demo &Demo::operator++() //前置++
+    {
+      n++;
+      return *this;
+    }
+    Demo Demo::operator++(int k) //后置++
+    {
+      Demo tmp(*this); //记录修改前的对象
+      n++;
+      return tmp; //返回修改前对象
+    }
+    Demo &Demo::operator--() //前置--
+    {
+      n--;
+      return *this;
+    }
+    Demo Demo::operator--(int k) //后置--
+    {
+      Demo tmp(*this);
+      n--;
+      return tmp;
+    }
+    int main()
+    {
+      Demo d(10);
+      cout << (d++) << ","; // d.operator++(0)
+      cout << d << ",";
+      cout << (++d) << ","; // d.operator++()
+      cout << d << ",";
+      cout << (d--) << ","; // d.operator--(d,0)
+      cout << d << ",";
+      cout << (--d) << ","; // d.operator--(d)
+      cout << d << ",";
+      return 0;
+    }
+    ```
+
+    
 
 
 
