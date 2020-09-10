@@ -307,7 +307,6 @@ using namespace std;
       return 0;
     }
     ```
-  ```
   
   - 引用作为函数的返回值
     
@@ -317,26 +316,27 @@ using namespace std;
     - 格式
       - `数据类型 & 函数名(参数列表)`
     
-    ```C++
-    #include <iostream>
-    using namespace std;
-    int oneX = 10;
-    int oneY = 20;
-    int &refValue(int &x) //返回值是引用,可作左值
-    {
-      return x;
-    }
-    int main()
-    {
-      refValue(oneX) = 30;             //返回值是引用,可作左值
-      cout << "oneX=" << oneX << endl; //输出 oneX=30
-      refValue(oneY) = 40;             //返回值是引用的函数调用表达式,可作左值使用
-      cout << "oneY=" << oneY << endl; //输出oneY=40
-      return 0;
-    }
-  ```
+      ```C++
+      #include <iostream>
+      using namespace std;
+      int oneX = 10;
+      int oneY = 20;
+      int &refValue(int &x) //返回值是引用,可作左值
+      {
+        return x;
+      }
+      int main()
+      {
+        refValue(oneX) = 30;             //返回值是引用,可作左值
+        cout << "oneX=" << oneX << endl; //输出 oneX=30
+        refValue(oneY) = 40;             //返回值是引用的函数调用表达式,可作左值使用
+        cout << "oneY=" << oneY << endl; //输出oneY=40
+        return 0;
+      }
+      ```
   
     - 函数返回值也可以是指针
+      
       - `类型标识符 * 函数名(实参列表)`
 
 
