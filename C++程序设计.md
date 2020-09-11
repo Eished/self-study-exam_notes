@@ -1,4 +1,6 @@
-> https://github.com/Eished/self-study-exam_notes
+> **计算机信息管理专业课程**
+>
+> 自考笔记在线更新地址 : https://github.com/Eished/self-study-exam_notes
 
 # 大纲 (2019版)
 
@@ -2659,37 +2661,528 @@ using namespace std;
 ## 第一节 类的继承与类的派生
 
 1. 继承的概念
+
+   - 通过已有的类建立新类的过程, 叫做派生; 
+     - 原来的类叫基类, 也叫父类或一般类;
+     - 新类称为派生类/子类/特殊类
+   - 除构造函数和析构函数外, 基类所有成员派生为子类成员
+     - 子类中可以增加/修改成员和权限
+   - 覆盖
+     - 派生类成员覆盖基类同名成员, 也称为重定义/ 重写/ 同名隐藏
+
 2. 派生类的定义与大小
+
+   - 格式
+
+     - ```C++
+       class 派生类名:继承方式说明符 基类名
+       {
+       	类名
+       };
+       ```
+
+     - 继承方式说明符指明基类成员在派生类中的访问属性, 一般用 `public`
+
+   - 派生类的大小
+
+     - 派生类大小 = 基类成员变量大小 + 派生类对象自身成员变量大小
+     - 对象的大小只与普通成员变量有关
+     - 字节补齐原则
+       - char 变量占 1字节, 补齐为 4 字节
+       - 空类的大小是1
+       - 32位系统 指针 4 字节,  64 位系统指针 8 字节
+
 3. 继承关系的特殊性
+
+   - 基类的友元类/友元函数, 派生类不继承友元类/友元函数
+   - 基类/成员是某类的友元函数, 派生类继承友元关系
+
 4. 有继承关系的类之间的访问
-5. protected 访问范围说明符
+
+   - 如果派生类声明了与基类成员函数同名函数, 即使参数表不同, 继承的同名函数会被隐藏
+
+     - 访问被隐藏的成员, 使用基类名和作用域分辨符来限定
+
+   - 访问基类和派生类成员的方式
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class CB
+       {
+       
+       public:
+         int a;
+         CB(int x)
+         {
+           a = x;
+         }
+         void showa()
+         {
+           cout << "Class Cb--a=" << a << endl;
+         }
+       };
+       class CD : public CB
+       {
+       public:
+         int a;                   //与基类同名
+         CD(int x, int y) : CB(x) //x 初始化基类的成员变量a
+         {
+           a = y;
+         }
+         void showa() //基类同名函数
+         {
+           cout << "Class CD--a" << a << endl;
+         }
+         void print2a()
+         {
+           cout << "a=" << a << endl;         //访问派生类a
+           cout << "CB::a=" << CB::a << endl; //访问基类a
+         }
+       };
+       int main()
+       {
+         CB CBobj(12);
+         CBobj.showa();
+         CD CDobj(48, 999);
+         CDobj.showa();     //访问派生类的showa()
+         CDobj.CB::showa(); //访问基类的showa()
+         cout << "CDobj.a" << CDobj.a << endl;
+         cout << "CDobj.CB::a=" << CDobj.CB::a << endl;
+         return 0;
+       }
+       ```
+
+   - 类之间的访问示例
+
+     - ```C++
+       #include <iostream>
+       #include <string>
+       using namespace std;
+       class CStudent //基类
+       {
+       private:
+         string name; //姓名
+         string id;   //学号
+         char gender; //性别,'F'代表女生, 'M'代表男生
+         int age;     //年龄
+       public:
+         void PrintInfo();
+         void SetInfo(const string &, const string &, int, char);
+         void SetName(string);
+         string GetName();
+         void SetId(string);
+         string GetId();
+       };
+       void CStudent::PrintInfo()
+       {
+         cout << "姓名:\t" << name << endl;
+         cout << "学号:\t" << id << endl;
+         cout << "年龄:\t" << age << endl;
+         cout << "性别:\t" << gender << endl;
+       }
+       void CStudent::SetInfo(const string &name_, const string &id_, int age_, char gender_)
+       {
+         name = name_;
+         id = id_;
+         age = age_;
+         gender = gender_;
+       }
+       void CStudent::SetName(string name)
+       {
+         this->name = name;
+       }
+       string CStudent::GetName()
+       {
+         return name;
+       }
+       void CStudent::SetId(string id)
+       {
+         this->id = id;
+       }
+       string CStudent::GetId()
+       {
+         return id;
+       }
+       
+       class CUndergraduateStudent : public CStudent //本科生类, 继承于类 CStudent
+       {
+       private:
+         string department; //学生所属的系名
+       
+       public:
+         void PrintInfo();
+         void SetInfo(const string &, const string &, int, char, const string &);
+       };
+       void CUndergraduateStudent::PrintInfo()
+       {
+         CStudent::PrintInfo();
+         cout << "院系:\t" << department << endl
+              << endl;
+       }
+       void CUndergraduateStudent::SetInfo(const string &name_, const string &id_, int age_, char gender_, const string &department_)
+       {
+         CStudent::SetInfo(name_, id_, age_, gender_);
+         department = department_;
+       }
+       
+       class CGraduatedStudent : public CStudent //研究生类
+       {
+       private:
+         string department; //学生所属的系名
+         string advisor;    //导师
+       public:
+         void PrintInfo();
+         void SetInfo(const string &name_, const string &id_, int age_, char gender_, const string &department_, const string &advisor_);
+       };
+       void CGraduatedStudent::PrintInfo()
+       {
+         CStudent::PrintInfo();
+         cout << "院系:\t" << department << endl;
+         cout << "导师:\t" << advisor << endl;
+       }
+       void CGraduatedStudent::SetInfo(const string &name_, const string &id_, int age_, char gender_, const string &department_, const string &advisor_)
+       {
+         CStudent::SetInfo(name_, id_, age_, gender_);
+         department = department_;
+         advisor = advisor_;
+       }
+       int main()
+       {
+         CStudent s1;
+         CUndergraduateStudent s2;
+         CGraduatedStudent s3;
+         s2.SetInfo("张三", "2020-6-2-4", 19, 'M', "数学系");
+         s3.SetInfo("李四", "M2021-12", 19, 'F', "计算机系", "罗教授");
+         s2.PrintInfo();
+         s3.PrintInfo();
+         cout << s2.GetName() << endl;
+         s2.SetName("王五");
+         s2.PrintInfo();
+         cout << s2.GetName() << "," << s2.GetId() << endl;
+         return 0;
+       }
+       ```
+
+       
+
+5. `protected` 访问范围说明符
+
+   - 保护成员访问范围比私有成员大, 基类的保护成员可以被派生类成员函数访问
+   - 基类需要隐藏的成员一般设置为保护成员, 方便派生类成员访问
+
 6. 多重继承
+
+   - 一个类同时有多个基类
+
+   - 格式
+
+     - ```C++
+       class 派生类名:继承方式说明符 基类名1, 继承方式说明符 基类名2, ... ,继承方式说明符 基类名n
+       {
+       	类体
+       }
+       ```
+
+     - 派生类继承了所有成员变量和成员函数, 和普通继承一样
+
+   - 如果多个基类成员重名
+
+     - 对派生类而言, 不加类名限定时默认访问的是派生类成员;
+     - 访问基类成员时, 加对应类名限定;
+     - 如果重名成员继承到派生类中, 不加限定访问会产生二义性问题
+
+   
 
 ## 第二节 访问控制
 
 1. 公有控制
+
+   - 基类的公有成员和保护成员的访问属性在派生类中不变, 而基类的私有成员在基类外不可直接访问, 派生类不能访问私有成员
+
+   - 公有继承访问控制
+
+     |         各成员         |     派生类中     |  基类与派生类外  |
+     | :--------------------: | :--------------: | :--------------: |
+     |     基类的公有成员     |     直接访问     |     直接访问     |
+     |     基类的保护成员     |     直接访问     | 调用共有函数访问 |
+     |     基类的私有成员     | 调用共有函数访问 | 调用共有函数访问 |
+     |  从基类继承的公有成员  |     直接访问     |     直接访问     |
+     |  从基类继承的保护成员  |     直接访问     | 调用共有函数访问 |
+     |  从基类继承的私有成员  | 调用共有函数访问 | 调用共有函数访问 |
+     | 派生类中定义的公有成员 |     直接访问     |     直接访问     |
+     | 派生类中定义的保护成员 |     直接访问     | 调用共有函数访问 |
+     | 派生类中定义的私有成员 |     直接访问     | 调用共有函数访问 |
+
+   - 方便统一处理, 提高程序效率
+
+     - 函数的形参为基类的对象/引用/指针时, 实参可以使派生类的对象/指针, 不用为每个类设计单独的模块
+
 2. 类型兼容规则
+
+   - 任何需要基类对象的地方, 都可以用公有派生类的对象来替代, 也称为 赋值兼容规则
+
+     1. 派生类的对象可以赋值给基类对象
+     2. 派生类对象可以用来初始化基类引用
+     3. 派生类对象的地址可以赋值给基类指针, 即派生类的指针可以赋值给基类的指针
+
+     此规则反过来不成立
+
+   - 验证类型兼容规则输出的结果
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class A //基类
+       {
+         int an;
+       
+       public:
+         A() {}
+         A(int n)
+         {
+           an = n;
+         }
+         void print()
+         {
+           cout << "A 的对象:";
+           cout << "an:" << an;
+         }
+         void print(int k)
+         {
+           cout << "an:" << an;
+         }
+       };
+       class B : public A
+       {
+         int bn;
+       
+       public:
+         B(int n) : A(2 * n)
+         {
+           bn = n;
+         }
+         void print()
+         {
+           cout << "\nB 的对象:";
+           A::print(1);
+           cout << ", bn=" << bn << endl;
+         }
+       };
+       
+       int main()
+       {
+         A a(10);
+         B b(20);
+         a.print();
+         b.print();
+         a = b;
+         a.print();
+         b.print();
+         return 0;
+       }
+       ```
+
+       
+
 3. 私有继承
+
+   - 基类中的公有成员和保护成员都以私有成员身份出现在派生类中, 基类的私有成员在派生类中不可直接访问
+
+     |                |   第一级派生中   | 第二季派生中 | 基类与派生类外 |
+     | :------------: | :--------------: | :----------: | :------------: |
+     | 基类的公有成员 |     直接访问     |   不可访问   |    不可访问    |
+     | 基类的保护成员 |     直接访问     |   不可访问   |    不可访问    |
+     | 基类的私有成员 | 调用公有函数访问 |   不可访问   |    不可访问    |
+
+     
+
+4. 保护继承
+
+   - 基类中公有成员和保护成员都以保护成员继承到派生类中, 私有成员不可直接访问
+
+
 
 ## 第三节 派生类的构造函数和析构函数
 
 1. 构造函数与析构函数
+
+   - 派生类不继承构造函数, 需要在派生类的构造函数中调用基类的构造函数, 已完成继承成员的初始化
+
+     - 执行派生类构造函数前, 总是先执行基类的构造函数, 析构函数反之
+
+   - 派生类在构造函数中添加初始化列表, 说明基类成员变量如何初始化
+
+     - 只要基类不是默认构造函数, 都要显式给出基类名和参数表
+
+     - 基类定义了带有形参的构造函数, 派生类就应当定义构造函数
+
+     - 格式
+
+       - ```C++
+         派生类名::派生类名(参数表):基类名1(基类1 初始化参数表), ... ,基类名m (基类m 初始化参数表), 成员对象名1(成员对象1 初始化参数表), ... ,成员对象名n (成员对象n 初始化参数表)
+         {
+         	派生类构造函数函数体   //其它初始化操作
+         }
+         ```
+
+   - 基类和派生类的构造/解析函数(5-15)
+
+     - ```C++
+       
+       ```
+
+   - 派生类函数执行的一般次序
+
+     1. 调用基类构造函数, 调用顺序按照被继承时声明的顺序(从左至右)
+     2. 对派生类新增成员变量的初始化, 调用顺序按照类中的声明顺序
+     3. 执行派生类的构造函数体中的内容
+
+   - 调用基类和派生类的构造函数/析构函数和成员函数(5-16)
+
+     - ```C++
+       
+       ```
+
+       
+
 2. 复制构造函数
+
+   - 一个类, 自动生成复制构造函数或自定义
+
+     - 默认的复制构造函数自动调用基类的复制构造函数, 对派生类新增的成员对象复制
+
+   - 派生类中的复制构造函数(5-17)
+
+     - ```C++
+       
+       ```
+
+   - 赋值运算符的重载及使用(5-18)
+
+     - ```C++
+       
+       ```
+
+       
+
 3. 多重继承的构造函数与析构函数
+
+   - 多重继承(5-19)
+
+     - ```C++
+       
+       ```
+
+       
 
 ## 第四节 类之间的关系
 
 1. 类与类之间的关系
+
+   - 使用已有类编写新类的两种方式
+     - 继承和组合
+     - 继承关系和组合关系(包含关系)
+
 2. 封闭类的派生
-3. 互包含关系的类
+
+   - 一个类的成员变量是另一个类的对象, 称为封闭类
+
+   - 定义封闭类构造函数的一般形式: 
+
+     - ```C++
+       类名::类名(形参表): 内嵌对象1(形参表),内前对象2(形参表), ...
+       {
+       	类体
+       }
+       ```
+
+     - `内嵌对象1(形参表),内前对象2(形参表), ...` 是初始化列表, 对内嵌对象进行初始化
+
+   - 封闭类的构造函数(5-20)
+
+     - ```C++
+       
+       ```
+
+       
+
+3. **互包含关系的类**
+
+   - 两个类相互引用, 称为循环依赖的类
+
+     - ```C++
+       class A //类 A 的定义
+       {
+       public:
+       	void f(B b); //以类B对象为参数的成员函数
+       };
+       class B //定义类 B
+       {
+       public:
+       	void g(A a); //以类A对象为参数的成员函数
+       }
+       ```
+
+     - 会编译错误
+
+   - 向前引用声明
+
+     - 引用未定义的类之前, 将该类的名字告诉编译器, 完整类的定义可以写在其他地方
+     - 在提供一个完整的类定义之前, **不能定义该类的对象**, 也不能内联成员函数中使用该类的对象
+
+   - 相互包含的类(5-21)
+
+     - ```C++
+       
+       ```
+
+       
 
 ## 第五节 多层次的派生
 
-- 
+- 类之间的继承关系具有传递性
+
+- 派生类成员包括
+
+  - 派生类自己定义的成员
+  - 直接基类中定义的成员
+  - 间接基类中定义的全部成员
+
+- 生成派生类对象时, 会依次执行所有基类的构造函数, 最后执行派生类的构造函数; 析构反之
+
+- 一个类可以是多个类的直接基类, 只能说明一次
+
+  - 一个类可以多次成为某个派生类的间接基类
+
+- 多级派生时构造函数的调用(5-22)
+
+  - ```C++
+    
+    ```
+
+    
 
 ## 第六节 基类与派生类指针的相互转换
 
-- 
+- 公有派生时, 派生类对象也是基类对象, 所以派生类对象可以赋值给基类对象
+
+  - 使用指针指向派生类对象
+  - 派生类指针赋值给基类指针
+    - 即使基类指针指向派生类对象, 不能通过基类指针访问派生类中定义的函数
+    - 当派生类指针指向基类对象时, 必须要将基类对象强制类型转换, 才能赋值给派生类指针
+
+- 使用指针的情况(5-23)
+
+  - ```C++
+    
+    ```
+
+- 基类引用也可以强制类型转换为派生类引用
+
+- 强制转换都存在安全隐患
+
+  - `dynamic_cast` 强制类型转换运算符, 判断转换是否安全 (指针或引用是否真的指向派生类对象)
 
 
 
