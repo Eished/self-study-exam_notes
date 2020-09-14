@@ -25,11 +25,16 @@
 
 - 本人使用：VScode
 
-  - 解决utf-8中文乱码问题, 在vs code修改代码的打开和保存方式
-
-    直接就将代码保存为 gb2312。在vs code右下角可以看到当前文件编码方式，点击utf-8修改打开和保存方式为 gb2312。
+  - 配置文件在附录
 
   - VScode 执行完会自动关闭终端, return 前设置断点
+
+    - 或者修改 `launch.json` 文件为  `"externalConsole": false,`
+    - 内置终端支持 utf-8
+
+  - 使用外置终端，utf-8 中文乱码问题, 在 vs code 修改代码的打开和保存方式
+
+    直接就将代码保存为 gb2312。在 vs code 右下角可以看到当前文件编码方式，点击utf-8 修改打开和保存方式为 gb2312。
 
 # 第一章 C++ 语言简介
 
@@ -208,9 +213,11 @@ using namespace std;
 
 - 声明函数时为形参指定默认值
   - 默认值写在声明或定义函数的地方, 不能都写
+  - `void` 声明无返回值
+  - 默认值不能是局部变量，调用函数可以用局部变量
 - 调用的函数有默认值的函数时, 可以不给出对应的实参或给出部分实参, 相当于使用默认值或部分使用默认值
 - **默认值的形参必须从右至左提供, 有形参的必须在最后**
-  - 调用时实参为连续排列
+  - 调用时实参为从左至右连续排列，不给则后面取默认值
 - 函数原型中, 可省略形参名字, 只给出类型和默认值
 
 
@@ -346,7 +353,7 @@ using namespace std;
 ### 六、const 与指针共同使用
 
 - const 修饰指针变量时
-  - 唯一 const 位于符号 * 左侧, 表示指针所指数据为常量, 数据不能通过本指针改变, 但可以通过其它方式修改; 指针本身是变量, 可以指向其它内存单元
+  - 唯一 `const` 位于符号 `*` 左侧, 表示指针所指数据为常量, 数据不能通过本指针改变, 但可以通过其它方式修改; 指针本身是变量, 可以指向其它内存单元
     - `const int *p = a`
   - 唯一 const 位于符号 * 右侧, 表示指针本身是常量, 不能改变指针指向, 数据可以通过本指针改变
     - `int * const p = a`
@@ -442,6 +449,29 @@ using namespace std;
     - 忘记 [] 时, 导致数组不完全释放
 
   - 使用 new 时, 一定要 delete 释放内存
+  
+    - ```C++
+      #include <iostream>
+      using namespace std;
+      int *A = new int[5];
+      int main()
+      {
+        for (int i = 0; i < 5; i++)
+        {
+          A[i] = i + 1;
+          cout << A[i] << endl;
+        }
+        // delete[] A;
+        delete A;
+        for (int i = 0; i < 5; i++)
+        {
+          cout << A[i] << endl;
+        }
+        return 0;
+      }
+      ```
+  
+      
 
 
 
@@ -474,19 +504,19 @@ using namespace std;
   - 支持运算符(ASCII)
   - “+” 拼接字符串
 
-- string 对象用法示例 
+- `string` 对象用法示例 
 
   | 函数                                                 | 功能                                                         |
   | ---------------------------------------------------- | ------------------------------------------------------------ |
-  | `const char *c_str() const;`                         | 返回一个指向字符串的指针, 内容与原 string 相同, 用于转换为 const char * |
+  | `const char *c_str() const;`                         | 返回一个指向字符串的指针, 内容与原 string 相同, 用于转换为 `const char *` |
   | `int size() const;`                                  | 返回当前字符串大小                                           |
   | `int length() const;`                                | 返回当前字符串长度                                           |
   | `bool empty() const;`                                | 返回当前字符串是否为空                                       |
-  | `size_type find(const char *str , size_type index);` | 返回 str 在字符串中第一次出现的位置, 从 index 开始查找, 没有返回-1 |
-  | `size_type find( char ch , size_type index);`        | 返回 ch 在字符串中第一次出现的位置, 从 index 开始查找, 没有返回-1 |
-  | `string &insert(int p, const string &s);`            | 在 p 位置插入字符串 s                                        |
-  | `string &append(const char *s);`                     | 将字符串 s 拼接到当前字符串结尾                              |
-  | `string substr(int pos=0, int n=npos) const;`        | 返回从 pos 开始的 n 个字符组成的字符串                       |
+  | `size_type find(const char *str , size_type index);` | 返回 `str` 在字符串中第一次出现的位置, 从 `index` 开始查找, 没有返回-1 |
+  | `size_type find( char ch , size_type index);`        | 返回 `ch` 在字符串中第一次出现的位置, 从 `index` 开始查找, 没有返回-1 |
+  | `string &insert(int p, const string &s);`            | 在 `p` 位置插入字符串 s                                      |
+  | `string &append(const char *s);`                     | 将字符串 `s` 拼接到当前字符串结尾                            |
+  | `string substr(int pos=0, int n=npos) const;`        | 返回从 `pos` 开始的 `n` 个字符组成的字符串                   |
 
 - 代码
 
@@ -1082,25 +1112,34 @@ using namespace std;
 
    - 使用已有对象来建立一个新对象
 
+   - 复制构造函数参数是本类的引用
+
    - 复制构造函数总是存在的
 
-   - 格式
-
+   - 对于类 A ，复制构造函数的原型如下
+   
+     - `A::A(const A&);`
+     - `A::A(A&);`
+   
+   - 声明和实现复制构造函数的格式
+   
      - ```C++
        class 类名
        {
        public:
        	类名(参数表);				//构造函数
        	类名(类名 & 对象名);	 //复制构造函数
-       	...
+    	...
        };
        类名::类名(类名 & 对象名) //复制构造函数的实现
        {
        	函数体
        }
        ```
-
-   - ```C++
+   
+   - 调用复制构造函数
+     
+     ```C++
      #include <iostream>
      #include <string>
      using namespace std;
@@ -1229,35 +1268,37 @@ using namespace std;
        stud.setName("444"); //姓名改为444
        Student ss[2] = {stud, Student()};
        stud.printStudent();
-       stud.setName("111");
+    stud.setName("111");
        ss[0] = Student(stud); //调用复制构造函数
-       ss[1] = Student();
+      ss[1] = Student();
        stud.printStudent();
-       ss[0].printStudent(); //姓名 Copy111
+    ss[0].printStudent(); //姓名 Copy111
        ss[1].printStudent(); //默认新对象
        return 0;
-     }
+   }
      ```
-
+     
    - 自动调用复制函数的三种情况
 
      1. 用一个对象去初始化本类另一个对象
 
         ```C++
-        类名 对象名2(对象名1);
-        类名 对象名2 = 对象名1;
-        ```
-
-     2. 函数F 的参数是类A 的对象, 调用F 时, 会调用类 A 的复制构造函数
-
+     类名 对象名2(对象名1);
+     类名 对象名2 = 对象名1;
+     ```
+   
+  2. 函数F 的参数是类A 的对象, 调用F 时, 会调用类 A 的复制构造函数
+   
      3. 函数返回值是类A 的对象, 函数返回时会调用类 A 的复制构造函数
-
-     注意: 复制构造函数的参数表中加上 const
-
+   
+     注意: 复制构造函数的参数表中加上 const 更好
+     
+     
+   
    **类型转换构造函数**
-
+   
    - 如果构造函数只有一个参数, 则可以看做类型转换构造函数, 作用是进行类型自动转换
-
+   
    - ```C++
      #include <iostream>
      #include <string>
@@ -1280,7 +1321,7 @@ using namespace std;
      };
      void Demo::printDemo()
      {
-       cout << "id=" << id << endl;
+      cout << "id=" << id << endl;
      }
      int main()
      {
@@ -1291,7 +1332,7 @@ using namespace std;
        return 0;
      }
      ```
-
+   
      
 
 ## 第二节 析构函数
@@ -2945,7 +2986,7 @@ using namespace std;
          int level;
        
        public:
-         manager(short ag, float sa, string na, int lev) : employee(ag, sa, na)
+         manager(short ag, float sa, string na, int lev) : employee(ag, sa, na) //初始化基类
          {
            level = lev;
          }
@@ -2960,7 +3001,7 @@ using namespace std;
          char speciality, adegree;
        
        public:
-         engineer(short ag, float sa, string na, char spe, char ade) : employee(ag, sa, na)
+         engineer(short ag, float sa, string na, char spe, char ade) : employee(ag, sa, na) //初始化基类
          {
            speciality = spe;
            adegree = ade;
@@ -2984,7 +3025,7 @@ using namespace std;
          ptitle post;
        
        public:
-         director(short ag, float sa, string na, int le, ptitle po) : manager(ag, sa, na, le)
+         director(short ag, float sa, string na, int le, ptitle po) : manager(ag, sa, na, le) //初始化基类
          {
            post = po;
          }
@@ -3039,11 +3080,92 @@ using namespace std;
      - 对派生类而言, 不加类名限定时默认访问的是派生类成员;
      - 访问基类成员时, 加对应类名限定;
      - 如果重名成员继承到派生类中, 不加限定访问会产生二义性问题
-  
+    
    - 多重继承(5-11)
    
      - ```C++
+       #include <iostream>
+       using namespace std;
+       class BaseClass1 //基类
+       {
+       public:
+         int v1, v2;
+         BaseClass1();
+         BaseClass1(int, int);
+         ~BaseClass1();
+       };
+       BaseClass1::BaseClass1()
+       {
+         cout << "BaseClass1 No parameter" << endl;
+       }
+       BaseClass1::BaseClass1(int m, int n) : v1(m), v2(n)
+       {
+         cout << "BaseClass1 Two parameter" << endl;
+       }
+       BaseClass1::~BaseClass1()
+       {
+         cout << "BaseClass1 Destroy" << endl;
+       }
        
+       class BaseClass2
+       {
+       public:
+         int v1, v4;
+         BaseClass2();
+         BaseClass2(int, int);
+         ~BaseClass2();
+       };
+       BaseClass2::BaseClass2()
+       {
+         cout << "BaseClass2 No parameter" << endl;
+       }
+       BaseClass2::BaseClass2(int m, int n) : v1(m), v4(n)
+       {
+         cout << "BaseClass2 Two parameter" << endl;
+       }
+       BaseClass2::~BaseClass2()
+       {
+         cout << "BaseClass2 Destroy" << endl;
+       }
+       
+       class DerivedClasss : public BaseClass1, public BaseClass2
+       {
+       public:
+         int v3;
+       
+       public:
+         DerivedClasss();
+         DerivedClasss(int);
+         DerivedClasss(int, int, int, int);
+         ~DerivedClasss();
+       };
+       DerivedClasss::DerivedClasss()
+       {
+         cout << "DerivedClasss No parameter" << endl;
+       }
+       DerivedClasss::DerivedClasss(int k) : v3(k)
+       {
+         cout << "DerivedClasss One parameter" << endl;
+       }
+       DerivedClasss::DerivedClasss(int m, int n, int k, int t) : BaseClass1(m, n), BaseClass2(m, t), v3(k)
+       {
+         cout << "DerivedClasss Four parameter" << endl;
+       }
+       DerivedClasss::~DerivedClasss()
+       {
+         cout << "DerivedClasss Destroy" << endl;
+       }
+       int main()
+       {
+         cout << " create object with parameter" << endl;
+         DerivedClasss derivedCla1(1000, 2000, 3000, 4000);
+         cout << "v1=" << derivedCla1.BaseClass1::v1 << endl;
+         cout << "v2=" << derivedCla1.v2 << endl;
+         cout << "v1=" << derivedCla1.BaseClass2::v1 << endl;
+         cout << "v4=" << derivedCla1.v4 << endl;
+         cout << "v3=" << derivedCla1.v3 << endl;
+         return 0;
+       }
        ```
    
        
@@ -3185,7 +3307,70 @@ using namespace std;
    - 基类和派生类的构造/解析函数(5-15)
 
      - ```C++
+       #include <iostream>
+       using namespace std;
+       class BaseClass //����
+       {
+       protected:
+         int v1, v2;
        
+       public:
+         BaseClass();
+         BaseClass(int, int);
+         ~BaseClass();
+       };
+       BaseClass::BaseClass()
+       {
+         cout << "BaseClass No parameter" << endl;
+       }
+       BaseClass::BaseClass(int m, int n)
+       {
+         v1 = m;
+         v2 = n;
+         cout << "BaseClass Two parameter" << endl;
+       }
+       BaseClass::~BaseClass()
+       {
+         cout << "BaseClass Destroy" << endl;
+       }
+       
+       class DerivedClass : public BaseClass
+       {
+         int v3;
+       
+       public:
+         DerivedClass();
+         DerivedClass(int);
+         DerivedClass(int, int, int);
+         ~DerivedClass();
+       };
+       DerivedClass::DerivedClass()
+       {
+         cout << "DerivedClass No parameter" << endl;
+       }
+       DerivedClass::DerivedClass(int k) : v3(k)
+       {
+         cout << "DerivedClass One parameter" << endl;
+       }
+       DerivedClass::DerivedClass(int m, int n, int k) : BaseClass(m, n), v3(k)
+       {
+         cout << "DerivedClass Three parameter" << endl;
+       }
+       DerivedClass::~DerivedClass()
+       {
+         cout << "DerivedClass Destroy" << endl;
+       }
+       
+       int main()
+       {
+         cout << "create no parameter object" << endl;
+         BaseClass baseCla;
+         DerivedClass derivedCla;
+         cout << "create with parameter object" << endl;
+         BaseClass baseCla1(10, 20);
+         DerivedClass derivedCla1(30);
+         return 0;
+       }
        ```
 
    - 派生类函数执行的一般次序
@@ -3197,9 +3382,58 @@ using namespace std;
    - 调用基类和派生类的构造函数/析构函数和成员函数(5-16)
 
      - ```C++
+       #include <iostream>
+       using namespace std;
+   class Base //基类
+       {
+       private:
+         int Y;
        
+       public:
+         Base(int y = 0)
+         {
+           Y = y;
+           cout << "Base(" << y << ")" << endl;
+         }
+         ~Base()
+         {
+           cout << "~Base()" << endl;
+         }
+         void print()
+         {
+           cout << Y << " ";
+         }
+       };
+       class Derived : public Base
+       {
+       private:
+         int Z;
+       
+       public:
+         Derived(int y, int z) : Base(y)
+         {
+           Z = z;
+           cout << "Derived(" << y << "," << z << ")" << endl;
+         }
+         ~Derived()
+         {
+           cout << "~Derived()" << endl;
+         }
+         void print()
+         {
+           Base::print();
+           cout << Z << endl;
+         }
+       };
+       
+       int main()
+       {
+         Derived d(10, 20);
+         d.print();
+         return 0;
+       }
        ```
-
+       
        
 
 2. 复制构造函数
@@ -3211,7 +3445,68 @@ using namespace std;
    - 派生类中的复制构造函数(5-17)
 
      - ```C++
+       #include <iostream>
+       using namespace std;
+       class A //基类
+       {
+       public:
+         A()
+         {
+           i = 100;
+           cout << "class A default construct function" << endl;
+         }
+         A(const A &s)
+         {
+           i = s.i;
+           cout << "calss A copy construct funciton" << endl;
+         }
+         int getValue();
+         void setValue(int);
        
+       private:
+         int i;
+       };
+       int A::getValue()
+       {
+         return i;
+       }
+       void A::setValue(int k)
+       {
+         i = k;
+       }
+       class B : public A
+       {
+       private:
+         float f;
+       
+       public:
+         B()
+         {
+           f = 20.1;
+           cout << "class B default construct function" << endl;
+         }
+         B(const B &v) : A::A(v), f(v.f)
+         {
+           cout << "class B copy construct function" << endl;
+         }
+         float getValue();
+         int getValue1()
+         {
+           return A::getValue();
+         }
+       };
+       float B::getValue()
+       {
+         return f;
+       }
+       
+       int main()
+       {
+         A a;
+         B b;
+         B bb(b); //调用类A 复制构造函数、类B 赋值构造函数
+         return 0;
+       }
        ```
 
    - 赋值运算符的重载及使用(5-18)
@@ -4338,3 +4633,303 @@ using namespace std;
 
 
 
+# 附录 VScode 配置文件
+
+## 编译环境 TDM-GCC
+
+1. `c_cpp_properties.json`
+
+   ```json
+   {
+       "configurations": [
+           {
+               "name": "Win32",
+               "includePath": [
+                   "${workspaceFolder}/**"
+               ],
+               "defines": [
+                   "_DEBUG",
+                   "UNICODE",
+                   "_UNICODE"
+               ],
+               "intelliSenseMode": "msvc-x64"
+           }
+       ],
+       "version": 4
+   }
+   ```
+
+2. `launch.json`
+
+   ```C++
+   {
+     "version": "0.2.0",
+     "configurations": [
+   
+       {
+         "name": "(gdb) Launch", // 配置名称，将会在启动配置的下拉菜单中显示
+         "type": "cppdbg", // 配置类型，这里只能为cppdbg
+         "request": "launch", // 请求配置类型，可以为launch（启动）或attach（附加）
+         "program": "${workspaceRoot}/${fileBasenameNoExtension}.exe", // 将要进行调试的程序的路径
+         "args": [], // 程序调试时传递给程序的命令行参数，一般设为空即可
+         "stopAtEntry": false, // 设为true时程序将暂停在程序入口处，一般设置为false
+         "cwd": "${workspaceRoot}", // 调试程序时的工作目录，一般为${workspaceRoot}即代码所在目录
+         "environment": [],
+         "externalConsole": false, // 调试时是否显示控制台窗口，一般设置为true显示控制台
+         "MIMode": "gdb",
+         "miDebuggerPath": "C:\\TDM-GCC-64\\bin\\gdb64.exe", // miDebugger的路径，注意这里要与MinGw的路径对应
+         "preLaunchTask": "g++", // 调试会话开始前执行的任务，一般为编译程序，c++为g++, c为gcc
+         "setupCommands": [{
+           "description": "Enable pretty-printing for gdb",
+           "text": "-enable-pretty-printing",
+           "ignoreFailures": true
+         }]
+       }
+     ]
+   }
+   ```
+
+3. `tasks.json`
+
+   ```C++
+   {
+     "version": "2.0.0",
+     "tasks": [{
+       "label": "g++",
+       "command": "g++",
+       "args": [
+         "-g",
+         "${file}",
+         "-o",
+         "${fileDirname}/${fileBasenameNoExtension}.exe"
+       ],
+       "problemMatcher": {
+         "owner": "cpp",
+         "fileLocation": [
+           "relative",
+           "${workspaceRoot}"
+         ],
+         "pattern": {
+           "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+           "file": 1,
+           "line": 2,
+           "column": 3,
+           "severity": 4,
+           "message": 5
+         }
+       },
+       "group": {
+         "kind": "build",
+         "isDefault": true
+       }
+     }]
+   }
+   ```
+
+
+
+
+# 附录 基本数据类型
+
+## 基本的内置类型
+
+C++ 为程序员提供了种类丰富的内置数据类型和用户自定义的数据类型。下表列出了七种基本的 C++ 数据类型：
+
+| 类型     | 关键字  |
+| :------- | :------ |
+| 布尔型   | bool    |
+| 字符型   | char    |
+| 整型     | int     |
+| 浮点型   | float   |
+| 双浮点型 | double  |
+| 无类型   | void    |
+| 宽字符型 | wchar_t |
+
+
+
+| 类型               | 位            | 范围                                                         |
+| :----------------- | :------------ | :----------------------------------------------------------- |
+| char               | 1 个字节      | -128 到 127 或者 0 到 255                                    |
+| unsigned char      | 1 个字节      | 0 到 255                                                     |
+| signed char        | 1 个字节      | -128 到 127                                                  |
+| int                | 4 个字节      | -2147483648 到 2147483647                                    |
+| unsigned int       | 4 个字节      | 0 到 4294967295                                              |
+| signed int         | 4 个字节      | -2147483648 到 2147483647                                    |
+| short int          | 2 个字节      | -32768 到 32767                                              |
+| unsigned short int | 2 个字节      | 0 到 65,535                                                  |
+| signed short int   | 2 个字节      | -32768 到 32767                                              |
+| long int           | 8 个字节      | -9,223,372,036,854,775,808 到 9,223,372,036,854,775,807      |
+| signed long int    | 8 个字节      | -9,223,372,036,854,775,808 到 9,223,372,036,854,775,807      |
+| unsigned long int  | 8 个字节      | 0 到 18,446,744,073,709,551,615                              |
+| float              | 4 个字节      | 精度型占4个字节（32位）内存空间，+/- 3.4e +/- 38 (~7 个数字) |
+| double             | 8 个字节      | 双精度型占8 个字节（64位）内存空间，+/- 1.7e +/- 308 (~15 个数字) |
+| long double        | 16 个字节     | 长双精度型 16 个字节（128位）内存空间，可提供18-19位有效数字。 |
+| wchar_t            | 2 或 4 个字节 | 1 个宽字符                                                   |
+
+> type:           ************size**************
+> bool:           所占字节数：1   最大值：1               最小值：0
+> char:           所占字节数：1   最大值：               最小值：
+> signed char:    所占字节数：1   最大值：               最小值：
+> unsigned char:  所占字节数：1   最大值：                最小值：
+> wchar_t:        所占字节数：2   最大值：65535           最小值：0
+> short:          所占字节数：2   最大值：32767           最小值：-32768
+> int:            所占字节数：4   最大值：2147483647      最小值：-2147483648
+> unsigned:       所占字节数：4   最大值：4294967295      最小值：0
+> long:           所占字节数：4   最大值：2147483647      最小值：-2147483648
+> unsigned long:  所占字节数：4   最大值：4294967295      最小值：0
+> double:         所占字节数：8   最大值：1.79769e+308    最小值：2.22507e-308
+> long double:    所占字节数：16  最大值：1.18973e+4932   最小值：3.3621e-4932
+> float:          所占字节数：4   最大值：3.40282e+38     最小值：1.17549e-38
+> size_t:         所占字节数：8   最大值：18446744073709551615    最小值：0
+> string:         所占字节数：32
+> type:           ************size**************
+
+## typedef 声明
+
+您可以使用 **typedef** 为一个已有的类型取一个新的名字。下面是使用 typedef 定义一个新类型的语法：
+
+```
+typedef type newname; 
+```
+
+例如，下面的语句会告诉编译器，feet 是 int 的另一个名称：
+
+```
+typedef int feet;
+```
+
+现在，下面的声明是完全合法的，它创建了一个整型变量 distance：
+
+```
+feet distance;
+```
+
+## 枚举类型
+
+枚举类型(enumeration)是C++中的一种派生数据类型，它是由用户定义的若干枚举常量的集合。
+
+如果一个变量只有几种可能的值，可以定义为枚举(enumeration)类型。所谓"枚举"是指将变量的值一一列举出来，变量的值只能在列举出来的值的范围内。
+
+创建枚举，需要使用关键字 **enum**。枚举类型的一般形式为：
+
+```
+enum 枚举名{ 
+     标识符[=整型常数], 
+     标识符[=整型常数], 
+... 
+    标识符[=整型常数]
+} 枚举变量;
+    
+```
+
+如果枚举没有初始化, 即省掉"=整型常数"时, 则从第一个标识符开始。
+
+例如，下面的代码定义了一个颜色枚举，变量 c 的类型为 color。最后，c 被赋值为 "blue"。
+
+```
+enum color { red, green, blue } c;
+c = blue;
+```
+
+默认情况下，第一个名称的值为 0，第二个名称的值为 1，第三个名称的值为 2，以此类推。但是，您也可以给名称赋予一个特殊的值，只需要添加一个初始值即可。例如，在下面的枚举中，**green** 的值为 5。
+
+```
+enum color { red, green=5, blue };
+```
+
+在这里，**blue** 的值为 6，因为默认情况下，每个名称都会比它前面一个名称大 1，但 red 的值依然为 0。
+
+
+
+# 附录 cmath 常用函数：
+
+## 取绝对值-fabs(double)
+
+```
+#include<iostream>
+#include<math.h>
+using namespace std;
+int main()
+{
+	double a=-12.1;
+	a=fabs(a);
+	cout<<a;
+	
+ } 
+12345678910
+```
+
+结果返回double类型：
+
+```
+12.1
+1
+```
+
+## 向上取整和向下取整-floor（double）和ceil（double）
+
+```
+#include<iostream>
+#include<math.h>
+using namespace std;
+int main()
+{
+	double a=-12.1,b,c;
+	b=floor(a);//向下取整
+	c=ceil(a);//向上取整
+	cout<<b<<endl<<c<<endl;
+	
+ } 
+1234567891011
+```
+
+结果返回double类型：
+
+```
+-13
+-12
+12
+```
+
+## 次方函数-pow（double a，double b）
+
+返回a的b次方，double类型。
+
+## 开平方根函数-sqrt（double x）
+
+返回根号a，double类型。
+
+## log函数-log（double x）
+
+返回以自然对数为底的对数。
+
+## 三角函数
+
+```
+#include<iostream>
+#include<math.h>
+using namespace std;
+int main()
+{
+	double pi=acos(-1);
+	double a=sin(pi*45/180);
+	double b=cos(pi*45/180);
+	double c=tan(pi*45/180);
+	cout<<a<<endl<<b<<endl<<c;
+	
+ } 
+123456789101112
+```
+
+pi是圆周率的精确定义，注意这里用的是弧度制，而不是角度制，返回：
+
+```
+-0.707107
+-0.707107
+1.000000
+123
+```
+
+## 四舍五入函数-round（double x）
+
+返回x的四舍五入，double类型
