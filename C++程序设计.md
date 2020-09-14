@@ -1497,12 +1497,10 @@ using namespace std;
          - 不是定义函数, 而是声明函数, 函数原型形参作用域只在声明中
          - 所以通常只要声明形参的个数和类型, 省略参数名
 
-   - 程序中出现的左右标识符都必须说明
+   - 重名标识符，不同作用域允许重名
 
-     ```
-     
-     ```
-
+     1. 无包含关系，互不影响
+     2. 有包含关系，在哪定义在哪有效
      
 
 2. 类对象的生存期和作用域
@@ -2075,7 +2073,7 @@ using namespace std;
 
    - 重载运算符作为友元函数时, 两个操作参数都要列出
 
-   - 重载为友元函数
+   - 重载作为友元函数
 
      - ```C++
        #include <iostream>
@@ -2493,7 +2491,7 @@ using namespace std;
 
   - `类型名 对象` 重载后等价于 `对象.operator 类型名()`
 
-  - 重载强制类型转换运算符 double
+  - 重载强制类型转换运算符 `double`
 
     - ```C++
       #include <iostream>
@@ -2666,9 +2664,13 @@ using namespace std;
      - 原来的类叫基类, 也叫父类或一般类;
      - 新类称为派生类/子类/特殊类
    - 除构造函数和析构函数外, 基类所有成员派生为子类成员
+     
      - 子类中可以增加/修改成员和权限
    - 覆盖
+     
      - 派生类成员覆盖基类同名成员, 也称为重定义/ 重写/ 同名隐藏
+     
+     
 
 2. 派生类的定义与大小
 
@@ -2688,14 +2690,58 @@ using namespace std;
      - 派生类大小 = 基类成员变量大小 + 派生类对象自身成员变量大小
      - 对象的大小只与普通成员变量有关
      - 字节补齐原则
-       - char 变量占 1字节, 补齐为 4 字节
+       - `char` 变量占 1字节, 补齐为 4 字节
        - 空类的大小是1
        - 32位系统 指针 4 字节,  64 位系统指针 8 字节
+       
+       
 
 3. 继承关系的特殊性
 
-   - 基类的友元类/友元函数, 派生类不继承友元类/友元函数
-   - 基类/成员是某类的友元函数, 派生类继承友元关系
+   - 基类的 友元类/友元函数, 派生类不继承 友元类/友元函数
+
+   - 基类/成员是 某类的友元函数, 派生类继承友元关系
+
+   - 如果基类中的成员是静态的，派生类中也是静态的，静态属性可继承(5-4)
+
+     - ```C++
+       #include <iostream>
+       using namespace std;
+       class Base
+       {
+       private:
+         float x;
+       
+       public:
+         static int staV;
+         Base()
+         {
+           staV++;
+         }
+       };
+       int Base::staV = 0;
+       class Derived : public Base
+       {
+       private:
+         float y;
+       
+       public:
+         Derived()
+         {
+           staV++;
+         }
+       };
+       int main()
+       {
+         Base a;
+         cout << a.staV << endl;
+         Derived d;
+         cout << d.staV << endl;
+         return 0;
+       }
+       ```
+
+       
 
 4. 有继承关系的类之间的访问
 
@@ -2703,7 +2749,7 @@ using namespace std;
 
      - 访问被隐藏的成员, 使用基类名和作用域分辨符来限定
 
-   - 访问基类和派生类成员的方式
+   - 访问基类和派生类成员的方式(5-5)
 
      - ```C++
        #include <iostream>
@@ -2753,7 +2799,7 @@ using namespace std;
        }
        ```
 
-   - 类之间的访问示例
+   - 类之间的访问示例(5-6)
 
      - ```C++
        #include <iostream>
@@ -2864,12 +2910,114 @@ using namespace std;
        }
        ```
 
+   - 类之间的访问(5-7)
+
+     - ```C++
+       #include <iostream>
+       #include <string>
+       using namespace std;
+       class employee //基类
+       {
+         short age;
+         float salary;
+       
+       protected:
+         string name;
+       
+       public:
+         employee(short ag, float sa, string na)
+         {
+           age = ag;
+           salary = sa;
+           name = na;
+         };
+         void print()
+         {
+           cout << "\n"
+                << name << ":\t";
+           cout << age << ":\t";
+           cout << salary;
+         };
+         ~employee() {}
+       };
+       class manager : public employee //派生类
+       {
+         int level;
+       
+       public:
+         manager(short ag, float sa, string na, int lev) : employee(ag, sa, na)
+         {
+           level = lev;
+         }
+         void print()
+         {
+           employee::print();
+           cout << "\tlevel:" << level;
+         }
+       };
+       class engineer : public employee //
+       {
+         char speciality, adegree;
+       
+       public:
+         engineer(short ag, float sa, string na, char spe, char ade) : employee(ag, sa, na)
+         {
+           speciality = spe;
+           adegree = ade;
+         }
+         void print()
+         {
+           employee::print();
+           cout << "\tspeciality:" << speciality;
+           cout << "\tadegree:" << adegree;
+         }
+       };
+       enum ptitle
+       {
+         PS,
+         GM,
+         VPS,
+         VGM
+       };
+       class director : public manager
+       {
+         ptitle post;
+       
+       public:
+         director(short ag, float sa, string na, int le, ptitle po) : manager(ag, sa, na, le)
+         {
+           post = po;
+         }
+         void print()
+         {
+           manager::print();
+           cout << "\tpost:" << post << endl;
+         }
+       };
+       int main()
+       {
+         employee emp1(23, 610.5, "wang"), emp2(27, 824.75, "li");
+         manager man1(32, 812.45, "zhang", 11), man2(34, 1200.5, "chen", 7);
+         engineer eng(26, 1420.10, "sun", 'E', 'M');
+         director dir(38, 1800.2, "liu", 2, VPS);
+         emp1.print();
+         emp2.print();
+         man1.print();
+         man2.employee::print();
+         eng.print();
+         dir.print();
+         return 0;
+       }
+       ```
+
        
 
 5. `protected` 访问范围说明符
 
    - 保护成员访问范围比私有成员大, 基类的保护成员可以被派生类成员函数访问
    - 基类需要隐藏的成员一般设置为保护成员, 方便派生类成员访问
+
+   
 
 6. 多重继承
 
@@ -2891,7 +3039,15 @@ using namespace std;
      - 对派生类而言, 不加类名限定时默认访问的是派生类成员;
      - 访问基类成员时, 加对应类名限定;
      - 如果重名成员继承到派生类中, 不加限定访问会产生二义性问题
-
+  
+   - 多重继承(5-11)
+   
+     - ```C++
+       
+       ```
+   
+       
+   
    
 
 ## 第二节 访问控制
@@ -2928,7 +3084,7 @@ using namespace std;
 
      此规则反过来不成立
 
-   - 验证类型兼容规则输出的结果
+   - 验证类型兼容规则输出的结果(5-14)
 
      - ```C++
        #include <iostream>
@@ -3217,7 +3373,7 @@ using namespace std;
      - 包含虚函数的类称为“多态类”
      - `virtual 函数返回值类型 函数名(形参表);`
    - 注意
-     1. 虽然讲虚函数声明为内联不会引起错误, 但因为内联函数是在编译阶段进行动态处理的, 而对虚函数的调用是动态绑定的, 所以虚函数一般不声明为内联函数
+     1. 虽然虚函数声明为内联不会引起错误, 但因为内联函数是在编译阶段进行动态处理的, 而对虚函数的调用是动态绑定的, 所以虚函数一般不声明为内联函数
      2. 派生类重写基类的虚函数实现多态, 要求函数名/参数列表及返回值类型要完全相同
      3. 基类中定义了虚函数, 在派生类中该函数始终个保持虚函数的特性
      4. 只有类的非静态成员函数才能定义为虚函数, 静态成员函数和友元函数不能定义为虚函数
