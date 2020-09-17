@@ -38,8 +38,8 @@
 
 ## 学习建议
 
-- 先大概看一遍全书，有整体概念，做习题时再去细看不懂的地方。
-- 习题代码写一遍，例题代码不用写看懂就行。
+- 先大概看一遍全书，有整体概念，**做习题时再去细看不懂的地方**，重点都在内容小结部分。
+- **习题代码写一遍，遇到不懂的再翻书或去网上查**，例题代码一般不用写看懂就行。
 
 
 
@@ -166,25 +166,27 @@ using namespace std;
 
   - ```C++
     static_cast<类型名>(表达式); //static_cast 可以省略
+    (类型名)(表达式) 或者 类型名(表达式) //省略后，简写方式
     
     oneInt2=static_cast<int>(oneDouble); //强制类型转换
     oneInt2=int(oneDouble); //强制类型转换运算符的新形式
     oneInt2=(int)oneDouble; //强制类型转换运算符的旧形式
     oneInt2=oneDouble; //自动类型转换
-    ```
-
+```
+    
   - ```C++
     const_cast<类型名>(表达式); 
-    ```
-
+  ```
+  
     - 用于去除指针和引用的常量性,不能去除变量的常量性
-    - 常量指针转化为非常量指针, 任指向原对象(`const int *p=> int *p`)
+    - 常量指针转化为非常量指针, 任指向原对象 (`const int *p=> int *p`)
     - 常量引用转化为非常量引用, 任指向原对象
-    - 指针的教程: https://www.imooc.com/video/7858
-      - 指针的本质就是内存地址
-
+    - `static_cast` **可以省略**  `(类型名)(表达式)`
+  - 指针的教程: https://www.imooc.com/video/7858
+    - 指针的本质就是内存地址
+  
   - 示例: 
-
+  
     ```C++
     #include <iostream>
     using namespace std;
@@ -209,9 +211,9 @@ using namespace std;
       cout << "p指向的地址为:\t" << p << "\t *p的值为:\t" << *p << endl;
       cout << "q指向的地址为:\t" << q << "\t *q的值为:\t" << *q << endl;
       return 0;
-    }
+  }
     ```
-
+  
   - 疑问: 常量的非常量指针修改内存地址内的值, 内存地址相同, 值不同
 
 
@@ -1670,7 +1672,11 @@ using namespace std;
 1. 封闭类构造函数和初始化列表
 
    - 定义封闭类的的构造函数时, 需要添加**初始化列表**, 指明要调用成员对象的那个构造函数
-   - 先执行成员变量的构造函数; 销毁时先执行封闭类析构函数, 在执行成员对象的析构函数
+   - 生成封闭类对象时
+     1. 先执行成员对象的构造函数，再执行封闭类的构造函数; 
+     2. 销毁时先执行封闭类析构函数, 再执行成员对象的析构函数；
+     3. **成员对象构造函数的执行顺序与成员对象在类定义中的说明顺序相同**。
+     4. 生成封闭类对象的语句要**说明对象中包含的成员对象**是如何初始化的，不说明则用默认构造函数或者参数全部省略的构造函数初始化
    - 添加初始化列表格式
      - `封闭类名::构造函数名(参数表):成员变量1(参数表),成员变量2(参数表),... {...}`
 
@@ -3614,19 +3620,196 @@ using namespace std;
    - 赋值运算符的重载及使用(5-18)
 
      - ```C++
+       #include <iostream>
+       using namespace std;
+   class Base
+       {
+       public:
+         Base() {}
+         Base(Base &c)
+         {
+           cout << "Base 复制构造函数" << endl;
+         }
+         Base operator=(const Base &b)
+         {
+           cout << "Base::operator=" << endl;
+           return *this;
+         }
+       };
+       class Derived : public Base
+       {
+       public:
+         Derived()
+         {
+           cout << "Derived::构造函数" << endl;
+         }
+       };
        
+       int main()
+       {
+         Derived d1, d2;
+         Derived d3(d1); // d3 初始化过程中会调用类 Base 的复制构造函数
+         d2 = d1;        // 会调用类 Base 的重载运算符“=”运算符
+         return 0;
+       }
        ```
-
+       
        
 
 3. 多重继承的构造函数与析构函数
 
+   - `Derived::Derived() : Base(0, 0), Base2(0,0), v3(0)` //派生类构造函数参数表的默认参数决定基类调用的构造函数参数，不应该为空
+- `class Derived : public Base, public Base2` **多重继承类定义时间接类的声明顺序就是初始化顺序**
+   
    - 多重继承(5-19)
-
-     - ```C++
+   
+  - ```C++
+       #include <iostream>
+       using namespace std;
+   class Base //基类
+       {
+       protected:
+         int v1, v2;
        
+       public:
+         Base();
+         Base(int, int);
+         ~Base();
+         void SetValue(int, int);
+         void PrintValue();
+       };
+       Base::Base() : v1(0), v2(0) //无参数时初始化成员变量
+       {
+         cout << "Base 无参构造函数" << endl;
+       }
+       Base::Base(int m, int n) : v1(m), v2(n)
+       {
+         v1 = m;
+         v2 = n;
+         cout << "Base 带2个参数构造函数, " << v1 << ", " << v2 << endl;
+       }
+       Base::~Base()
+       {
+         cout << "Base 析构函数" << endl;
+       }
+       void Base::SetValue(int m, int n)
+       {
+         v1 = m;
+         v2 = n;
+       }
+       void Base::PrintValue()
+       {
+         cout << "v1=" << v1 << "\tv2=" << v2 << endl;
+       }
+       
+       class Base2 //基类
+       {
+       protected:
+         int v1, v4;
+       
+       public:
+         Base2();
+         Base2(int, int);
+         ~Base2();
+         void SetValue(int, int);
+         void PrintValue();
+       };
+       Base2::Base2() : v1(0), v4(0) //无参数时初始化成员变量
+       {
+         cout << "Base2 无参构造函数" << endl;
+       }
+       Base2::Base2(int m, int n) : v1(m), v4(n)
+       {
+         v1 = m;
+         v4 = n;
+         cout << "Base2 带2个参数构造函数, " << v1 << ", " << v4 << endl;
+       }
+       Base2::~Base2()
+       {
+         cout << "Base2 析构函数" << endl;
+       }
+       void Base2::SetValue(int m, int n)
+       {
+         v1 = m;
+         v4 = n;
+       }
+       void Base2::PrintValue()
+       {
+         cout << "v1=" << v1 << "\tv4=" << v4 << endl;
+       }
+       
+       class Derived : public Base, public Base2
+       {
+       public:
+         int v3;
+       
+       public:
+         Derived();
+         Derived(int);
+         Derived(int, int, int, int);
+         ~Derived();
+         void SetValue(int m, int n, int k, int h)
+         {
+           Base::SetValue(m, n);
+           Base2::SetValue(2 * m, h);
+           v3 = k;
+         }
+         void SetValue(int m, int n, int k)
+         {
+           Base::SetValue(m, n);
+           Base2::SetValue(2 * m, 2 * n);
+           v3 = k;
+         }
+         void SetValue(int m, int n)
+         {
+           Base::SetValue(m, n);
+           Base2::SetValue(-1, -1);
+           v3 = -1;
+         }
+         void PrintValue();
+       };
+       Derived::Derived() : Base(0, 0), Base2(), v3(0) //此处默认参数决定基类调用的构造函数参数
+       {
+         cout << "Derived 无参构造函数" << endl;
+       }
+       Derived::Derived(int k)
+       {
+         v3 = k;
+         cout << "带1个参数构造函数" << endl;
+       }
+       Derived::Derived(int m, int n, int k, int t) : Base(m, n), Base2(m, t), v3(k)
+       {
+         cout << "带4个参数构造函数" << endl;
+       }
+       Derived::~Derived()
+       {
+         cout << "Derived 析构函数" << endl;
+       }
+       void Derived::PrintValue()
+       {
+         Base::PrintValue();
+         cout << "\tv3=" << v3 << endl;
+         Base2::PrintValue();
+         cout << endl;
+       }
+       
+       int main()
+       {
+         cout << "带4个参数对象的创建" << endl;
+         Derived derived(1000, 2000, 3000, 4000);
+         derived.PrintValue();
+         cout << endl
+              << "不带参数对象的创建" << endl;
+         Derived derived2;
+         derived2.PrintValue();
+         cout << endl
+              << "带1个参数对象的创建" << endl;
+         Derived derived3(111);
+         derived3.PrintValue();
+         return 0;
+       }
        ```
-
+       
        
 
 ## 第四节 类之间的关系
@@ -3706,6 +3889,8 @@ using namespace std;
 
 - 生成派生类对象时, 会依次执行所有基类的构造函数, 最后执行派生类的构造函数; 析构反之
 
+  - 初始化列表中，从右往左执行构造函数
+
 - 一个类可以是多个类的直接基类, 只能说明一次
 
   - 一个类可以多次成为某个派生类的间接基类
@@ -3730,10 +3915,51 @@ using namespace std;
   - **基类指针不能直接赋值给派生类指针**
     - 通过强制类型转换,可以将基类指针强制转换成派生类指针后再赋值给派生类指针
 
-- 使用指针的情况(5-23)
+- **下面的代码演示了基类和派生类指针的互相转换：**(5-23)
 
   - ```C++
-    
+    #include <iostream>
+    using namespace std;
+    class CBase
+    {
+    protected:
+        int n;
+    public:
+        CBase(int i) :n(i) { }
+        void Print() { cout << "CBase:n=" << n << endl; }
+    };
+    class CDerived :public CBase
+    {
+    public:
+        int v;
+        CDerived(int i) :CBase(i), v(2 * i) { }
+        void Func() { };
+        void Print()
+        {
+            cout << "CDerived:n=" << n << endl;
+            cout << "CDerived:v=" << v << endl;
+        }
+    };
+    int main()
+    {
+        CDerived objDerived(3);
+        CBase objBase(5);
+        CBase * pBase = &objDerived; // 使得基类指针指向派生类对象
+                                     //pBase->Func(); //错, CBase类没有Func()成员函数
+                                     //pBase->v = 5;  //错 CBase类没有v成员变量
+        pBase->Print();
+        cout << "1)------------" << endl;
+        //CDerived * pDerived = & objBase; //错，不能将基类指针赋值给派生类指针
+        CDerived * pDerived = (CDerived *)(&objBase);
+      //等同于 CDerived *pDerived = static_cast<CDerived *>(&objBase);
+        pDerived->Print();  //慎用，可能出现不可预期的错误
+        cout << "2)------------" << endl;
+        objDerived.Print();
+        cout << "3)------------" << endl;
+        pDerived->v = 128;  //往别人的空间里写入数据，会有问题
+        objDerived.Print();
+        return 0;
+    }
     ```
 
 - 基类引用也可以强制类型转换为派生类引用
@@ -3741,6 +3967,83 @@ using namespace std;
 - 强制转换都存在安全隐患
 
   - `dynamic_cast` 强制类型转换运算符, 判断转换是否安全 (指针或引用是否真的指向派生类对象)
+  
+- 各种类型转换示例
+
+  - ```C++
+    #include <iostream>
+    using namespace std;
+    class Base
+    {
+      int n;
+    
+    public:
+      Base() //没有方法内容会报错
+      {
+        cout << "基类" << endl;
+      }
+      void Print()
+      {
+        cout << "基类打印" << endl;
+      }
+    };
+    
+    class Derived : public Base
+    {
+    public:
+      Derived()
+      {
+        cout << "派生类" << endl;
+      }
+      void Print()
+      {
+        cout << "派生类打印" << endl;
+      }
+    };
+    
+    int main()
+    {
+      Base b;
+      Derived der;
+      cout << "-----基类指针指向派生类对象-------" << endl;
+      Base *pBase = &der; //基类指针指向派生类对象
+      pBase->Print();     //基类 Print 函数
+    
+      cout << "-------基类指针指向基类对象-----" << endl;
+      pBase = &b;     //基类指针指向基类对象
+      pBase->Print(); //基类 Print 函数
+    
+      cout << "-------派生类对象转换为基类对象-----" << endl;
+      ((Base)der).Print(); //指针或对象是什么类型就调用什么类型的函数
+      // ((Derived)b).Print(); //基类对象无法转换为派生类对象
+    
+      cout << "------派生类指针指向派生类对象------" << endl;
+      Derived *pDer = &der; //派生类指针指向派生类对象
+      pDer->Print();        //派生类 Print 函数
+    
+      cout << "-----派生类指针指向基类指针转换成派生类指针-------" << endl;
+      pDer = (Derived *)(pBase); //基类指针转换成派生类指针赋值给派生类指针
+      pDer->Print();             //派生类 Print 函数
+    
+      cout << "-----派生类指针指向转换成派生类型的基类对象-------" << endl;
+      pDer = (Derived *)(&b); //派生类指针指向转换成派生类型的基类对象
+      pDer->Print();          //派生类 Print 函数
+    
+      cout << "-----派生类指针转换成基类指针-------" << endl;
+      pBase = ((Base *)(pDer)); //派生类指针转换成基类指针
+      pBase->Print();           //基类 Print 函数
+    
+      cout << "-----函数调用-------" << endl;
+      pDer->Base::Print();           //派生类指针调用基类函数
+      pBase->Base::Print();          //基类指针调用基类函数
+      ((Derived *)(pBase))->Print(); //基类指针转换派生指针调用派生类函数
+      pBase->Print();
+      pDer->Print();
+      return 0;
+    }
+    ```
+
+    
 
 
 
@@ -3774,15 +4077,14 @@ using namespace std;
      - `virtual 函数返回值类型 函数名(形参表);`
    - 注意
      1. 虽然虚函数声明为内联不会引起错误, 但因为内联函数是在编译阶段进行动态处理的, 而对虚函数的调用是动态绑定的, 所以虚函数一般不声明为内联函数
-     2. 派生类重写基类的虚函数实现多态, 要求函数名/参数列表及返回值类型要完全相同
-     3. 基类中定义了虚函数, 在派生类中该函数始终个保持虚函数的特性
+     2. **派生类重写基类的虚函数实现多态**, 要求函数名/参数列表及返回值类型要完全相同
+     3. 基类中定义了虚函数, 在派生类中该函数始终个**保持虚函数**的特性
      4. 只有类的非静态成员函数才能定义为虚函数, 静态成员函数和友元函数不能定义为虚函数
      5. 如果虚函数的定义是在类体外, 则只需在声明函数时添加 `virtual` 关键字, 定义时不加 `virtual` 关键字
      6. 构造函数不能定义为虚函数, `operator=` 容易混淆, 也不要定义为虚函数
-     7. 不要在构造函数和析构函数中调用虚函数, 构造/析构函数中, 对象不完整
-     8. 最好将基类的析构函数声明为虚函数
+     7. **不要在构造函数和析构函数中调用虚函数**, 构造/析构函数中, 对象不完整
+     8. **最好将基类的析构函数声明为虚函数**
      9. 全局函数不属于类, 没有继承关系, 无法覆盖, 不能使用多态
-     10. 基类声明成员函数为虚函数, 派生类相同成员函数都是虚函数
      
      
    
@@ -3903,10 +4205,10 @@ using namespace std;
 
 2. 抽象类
 
-   - 纯虚函数的类称为抽象类
+   - 包含纯虚函数的类称为抽象类
 
      - 抽象类中有未完成的函数定义, 不能实例化对象
-     - 抽象类的派生类中, 如果内有给出全部纯虚函数的定义, 派生类继续是抽象类, 直到派生类中给出纯虚函数定义后, 才不是抽象类
+     - 抽象类的派生类中, 如果没有给出全部纯虚函数的定义, 派生类继续是抽象类, 直到派生类中给出纯虚函数定义后, 才不是抽象类
      - 可以定义抽象类的指针和引用, 指针访问派生类的成员, 具有多态性
 
    - 抽象类实例(6-10)
@@ -4105,7 +4407,7 @@ using namespace std;
      | `setbase(int b)`            | 设置输出整数时的进制，`b`为8、10、16                         |
      | `setw(int w)`               | 指定输出宽度为 w 个字符，或输入字符串时读入w个字符。一次有效 |
      | `setfill(int c)`            | 指定输出宽度，宽度不足时用ASCII码为c的字符填充（默认空格）   |
-     | `setpercision(int n)`       | 设置浮点数精度n。默认n为有效数字位数，`fixed/scientific`后n是小数点后保留位数 |
+     | `setpercision(int n)`       | 设置浮点数精度 n, 默认 n 为有效数字位数，`fixed/scientific`后n是小数点后保留位数 |
      | `setiosflags(fmtfalgs f)`   | 通用操作符。将格式标志f对应的格式标志位置为1                 |
      | `resetiosflags(fmtfalgs f)` | 通用操作符。将格式标志f对应的格式标志位置为0（清除）         |
      | `boolapha`                  | 把`true` 和 `false` 输出为字符串                             |
