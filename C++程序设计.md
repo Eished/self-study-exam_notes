@@ -172,18 +172,20 @@ using namespace std;
     oneInt2=int(oneDouble); //强制类型转换运算符的新形式
     oneInt2=(int)oneDouble; //强制类型转换运算符的旧形式
     oneInt2=oneDouble; //自动类型转换
+    ```
 ```
     
   - ```C++
     const_cast<类型名>(表达式); 
-  ```
-  
+```
+
     - 用于去除指针和引用的常量性,不能去除变量的常量性
     - 常量指针转化为非常量指针, 任指向原对象 (`const int *p=> int *p`)
     - 常量引用转化为非常量引用, 任指向原对象
     - `static_cast` **可以省略**  `(类型名)(表达式)`
   - 指针的教程: https://www.imooc.com/video/7858
-    - 指针的本质就是内存地址
+    
+  - 指针的本质就是内存地址
   
   - 示例: 
   
@@ -211,7 +213,7 @@ using namespace std;
       cout << "p指向的地址为:\t" << p << "\t *p的值为:\t" << *p << endl;
       cout << "q指向的地址为:\t" << q << "\t *q的值为:\t" << *q << endl;
       return 0;
-  }
+    }
     ```
   
   - 疑问: 常量的非常量指针修改内存地址内的值, 内存地址相同, 值不同
@@ -3660,7 +3662,7 @@ using namespace std;
 
    - `Derived::Derived() : Base(0, 0), Base2(0,0), v3(0)` //派生类构造函数参数表的默认参数决定基类调用的构造函数参数，不应该为空
 - `class Derived : public Base, public Base2` **多重继承类定义时间接类的声明顺序就是初始化顺序**
-   
+  
    - 多重继承(5-19)
    
   - ```C++
@@ -4297,74 +4299,142 @@ using namespace std;
   - 将标准输出 `cout` 重定向到文件(7-1)
 
     - ```C++
-      
+      #include <iostream>
+      using namespace std;
+    int main()
+      {
+      int x, y;
+        cin >> x >> y;
+        freopen("test.txt", "w", stdout);
+        if (y == 0)
+        cerr << "error." << endl;
+        else
+        cout << x << "/" << y << "=" << x / y << endl;
+        return 0;
+      }
       ```
-
+  
   - 标准输入重定向为文件(7-2)
-
-    - ```C++
-      
+  
+  - ```C++
+      #include <iostream>
+    using namespace std;
+      int main()
+    {
+        int x, count, sum = 0;
+        freopen("input.dat", "r", stdin); //标准输入定向到文件
+        for (count = 0; count < 10; count++)
+      {
+          cin >> x;
+        sum += x;
+        }
+      cout << "前" << count << "个整数的平均值 = " << 1.0 * sum / count << endl;
+        return 0;
+    }
       ```
-
+  
   - `ios` 中错误状态字
-
-    | 标识常量  |  值  |              含义              |
+  
+  | 标识常量  |  值  |              含义              |
     | :-------: | :--: | :----------------------------: |
-    | `goodbit` | 0X00 |           流状态正常           |
+  | `goodbit` | 0X00 |           流状态正常           |
     | `eofbit`  | 0X01 |           文件结束符           |
-    | `failbit` | 0X02 | I/O 操作失败,数据未丢失,可恢复 |
+  | `failbit` | 0X02 | I/O 操作失败,数据未丢失,可恢复 |
     | `badbit`  | 0X04 |   非法操作,数据丢失,不可恢复   |
-
+  
   - `ios` 中流相关的成员函数, 可直接使用
-
-    1. 返回流是否结束
-
-       - `int eof() const;`
+  
+  1. 返回流是否结束
+  
+     - `int eof() const;`
        - 是否遇到文件尾, 是则返回1, 否则返回0
-       - Ctrl+Z 表示输入流结束
-
-    2. 返回流是否处于正常状态
-
-       - `int fail() const;`
-
-    3. 判断流是否正常
-
-       - ```C++
+     - Ctrl+Z 表示输入流结束
+  
+  2. 返回流是否处于正常状态
+  
+     - `int fail() const;`
+  
+  3. 判断流是否正常
+  
+     - ```C++
          int good() const;
          int operator void *();
          ```
 
-       - `eofbit failbit badbit` 是否为1，否则返回0
+       - `eofbit failbit badbit` 是否为0，否则返回1
 
     4. 返回流是否处于失败状态
-
+  
        - ```C++
-         int bad() const;
+       int bad() const;
          int operator void !();
          ```
-
+  
        - `eofbit failbit badbit` 是否为1，否则返回0
-
+  
     5. 返回状态字
-
+  
        - `int rdstate() const;`
-
+  
     6. 恢复状态字
-
+  
        - `void clear(int nStata = 0 );`
-
+  
   - 标准输入重定向为文件并判断文件状态(7-3)
-
+  
     - ```C++
-      
+      #include <iostream>
+      using namespace std;
+      int main()
+      {
+        int x, count, sum = 0;
+        freopen("input.dat", "r", stdin); //标准输入定向到文件
+        for (count = 0; count < 10; count++)
+        {
+          cin >> x;
+          if (cin.eof())
+          {
+            cout << cin.eof() << "结束" << endl;
+            break;
+          }
+          else
+          {
+            cout << x << "," << sum << endl;
+            sum += x;
+          }
+        }
+        // 遇到输出中文失败，程序不输出结果，代码编码问题，GB2312改为 UTF-8即可。
+        cout << "前" << count << "个整数的平均值 = " << 1.0 * sum / count << endl;
+        return 0;
+      }
       ```
-
+  
   - 将键盘输入的数据累加(7-4)
-
+  
     - ```C++
-      
+      #include <iostream>
+      using namespace std;
+  int main()
+      {
+        char ch;
+        int x, count = 0, sum = 0;
+        cout << "请输入整数 Ctrl+Z 退出" << endl;
+        do
+        {
+          while (cin >> x)
+          {
+            sum += x;
+            count++;
+          }
+          cout << "确认退出请输入 Q";
+          cin.clear();
+          cin >> ch;
+        } while (toupper(ch) != 'Q');
+        cout << "sum=" << sum << ",count=" << count << endl;
+        return 0;
+      }
       ```
-
+      
       
 
 ## 第三节 控制 IO 格式
@@ -4407,7 +4477,7 @@ using namespace std;
      | `setbase(int b)`            | 设置输出整数时的进制，`b`为8、10、16                         |
      | `setw(int w)`               | 指定输出宽度为 w 个字符，或输入字符串时读入w个字符。一次有效 |
      | `setfill(int c)`            | 指定输出宽度，宽度不足时用ASCII码为c的字符填充（默认空格）   |
-     | `setpercision(int n)`       | 设置浮点数精度 n, 默认 n 为有效数字位数，`fixed/scientific`后n是小数点后保留位数 |
+     | `setpercision(int n)`       | **设置浮点数精度 n, 默认 n 为有效数字位数**，`fixed/scientific`后n是小数点后保留位数 |
      | `setiosflags(fmtfalgs f)`   | 通用操作符。将格式标志f对应的格式标志位置为1                 |
      | `resetiosflags(fmtfalgs f)` | 通用操作符。将格式标志f对应的格式标志位置为0（清除）         |
      | `boolapha`                  | 把`true` 和 `false` 输出为字符串                             |
@@ -4427,21 +4497,73 @@ using namespace std;
    - 使用流操纵符控制整数输出(7-5)
 
      - ```C++
-       
+       #include <iostream>
+       #include <iomanip>
+       using namespace std;
+       int main()
+       {
+         int n = 65535, m = 20;
+         //分别输出一个整数的十进制 十六进制 八进制
+         cout << "十进制：" << n << "=" << hex << n << "=" << oct << n << endl;
+         //使用 setbase 分别输出一个整数的十进制、十六进制和八进制
+         cout << "" << setbase(10) << m << "=" << setbase(16) << m << "=" << setbase(8) << m << endl;
+         //使用 showbase 和 setbase 分别输出一个整数 十进制、十六进制、八进制
+         cout << showbase;
+         cout << setbase(10) << m << "=" << setbase(16) << m << "=" << setbase(8) << m << endl;
+         return 0;
+       }
        ```
 
    - 使用流操纵符控制浮点数输出(7-6)
 
      - ```C++
+       #include <iostream>
+       #include <iomanip>
+       using namespace std;
+       int main()
+       {
+         double x = 1234567.89, y = 1.23456789;
+         //无格式控制
+         cout << "无格式控制：\t\t x=(" << x << "),y=(" << y << ")\n";
        
+         //保留5位有效数字
+         cout << "保留5位有效数字：\t\t x=(" << setprecision(5) << x << "),y=(" << y << ")\n";
+       
+         //保留小数点后5位
+         cout << "保留小数点后5位：\t\t x=(" << fixed << setprecision(5) << x << "),y=(" << y << ")\n";
+       
+         //科学计数法，保留小数点后5位
+         cout << "科学计数法，保留小数点后5位：\t\t x=(" << scientific << setprecision(5) << x << "),y=(" << y << ")\n";
+       
+         //非负数显示正号，输出宽度为12字符，宽度不足时用‘*’填补
+         cout << "非负数显示正号：\t\t " << showpos << fixed << setw(12) << setfill('*') << y << endl;
+       
+         //非负数不显示正号，输出宽度为12字符，宽度不足时右边用填充字符填充
+         cout << "不显示正号，右边用填充字符填充：\t\t " << noshowpos << left << setw(12) << y << endl;
+       
+         //输出宽度为12字符，宽度不足时左边用填充字符填充
+         cout << "左边用填充字符填充：\t\t " << showpos << right << setw(12) << y << endl;
+       
+         //宽度不足时，负号和数值分列左右，中间用填充字符填充
+         cout << "中间用填充字符填充：\t\t " << showpos << internal << setw(12) << -y << endl;
+       }
        ```
 
    - 通过 `setw()` 控制输入格式(7-7)
 
-     - ```
-       
+     - ```C++
+       #include <iostream>
+       #include <iomanip>
+   using namespace std;
+       int main()
+       {
+         string s1, s2;
+         cin >> setw(5) >> s1 >> setw(3) >> s2;
+         cout << "s1=" << s1 << ",s2=" << s2 << endl;
+         return 0;
+       }
        ```
-
+       
        
 
 2. 标志字
@@ -4484,9 +4606,22 @@ using namespace std;
    - 通过 `setiosflags()` 设置标志字进行格式控制(7-8)
 
      - ```C++
-       
+       #include <iostream>
+       #include <iomanip>
+using namespace std;
+       int main()
+       {
+         double x = 12.34;
+         cout << "1)" << setiosflags(ios::scientific | ios::showpos) << x << endl;
+         cout << "2)" << resetiosflags(ios::scientific | ios::showpos) << setiosflags(ios::showbase) << x << endl;
+         cout << "3)" << resetiosflags(ios::fixed)
+              << setiosflags(ios::scientific | ios::showpos) << x << endl;
+         cout << "4)" << resetiosflags(ios::showpos) << x << endl;
+         cout << "5)" << resetiosflags(ios::scientific) << setiosflags(ios::fixed) << x << endl;
+         return 0;
+       }
        ```
-
+       
        
 
 ## 第四节 调用 cout 的成员函数
@@ -4494,11 +4629,34 @@ using namespace std;
 - 常见用于控制格式的成员函数原型如下
 
   1. 设置和返回标志字
+     - `long flag(long 1Flags); `  
+       - 使用参数 1Flags 设置（替换）标志字，返回设置前标志字
+     -  `long flag() const;` 
+       - 返回当前标志字
   2. 设置标志位
+     - `long setf(long 1Flags); `  
+       - 使用参数 1Flags 置位标志字，返回置位前标志字
+     - `long setf(long 1Flags, long 1Mask); `  
+       - 1Mask 指定标志位清零，设置 1Flags 标志位，返回更新前标志字
   3. 清除标志位
+     - `long unsetf(long 1Flags);`
+       - 清除参数 1Flags 指定的标志位，返回清除前的标志字
+       - 标志位与 `setiosflags()` 用到的参数相同
   4. 设置和返回输出宽度
+     - `int width(int nw);`
+       - 将下一个输出项的显示宽度设置为 nw。如果nw 大于数据所需宽度，则右对齐。如果nw 小于数据所需宽度，则 nw 无效。一次性有效。
+     - `int width() const;`
+       - 返回值为当前的输出宽度值
   5. 设置填充字符
+     - `char fill(char cFill);`
+       - 设置宽度大于数据所需宽度时，参数 cFill 填充空白。
+     - `char fill() const;`
+       - 返回当前使用的填充符
   6. 设置数据显示精度
+     - `int percision(int np);`
+       - 用参数np 设置数据显示精度。浮点数 np 表示小数点后的数字位数。科学计数法np 表示尾数精度位数（包括小数点）。
+     - `int precision() const;`
+       - 返回当前数据显示精度。
 
 - `ostream` 类的成员函数及作用相同的流操作符
 
@@ -4513,13 +4671,51 @@ using namespace std;
 - 使用 cout 中的函数控制输出格式(7-9)
 
   - ```C++
-    
+    #include <iostream>
+    #include <iomanip>
+    using namespace std;
+    int main()
+    {
+      double values[] = {1.23, 20.3456, 300.4567, 4000.56789, 50000.1234567};
+      cout.fill('*'); //填充*
+      for (int i = 0; i < sizeof(values) / sizeof(double); i++)
+      {
+        cout << "values[" << i << "]=(";
+        cout.width(10); //设置宽度
+        cout << values[i] << ")" << endl;
+      }
+      cout.fill(' '); //填充空格
+      for (int i = 0; i < sizeof(values) / sizeof(double); i++)
+      {
+        cout << "values[" << i << "]=(";
+        cout.width(10);        //设置宽度
+        cout.precision(i + 3); //设置保留有效数字
+        cout << values[i] << ")" << endl;
+      }
+      return 0;
+    }
     ```
 
-- 使用 cout() 函数
+- 使用 cout() 函数(7-10)
 
   - ```C++
-    
+    #include <iostream>
+    #include <iomanip>
+    using namespace std;
+    int main()
+    {
+      char c = 'a', str[80] = "1234567890abcdefghijklmn";
+      int x = 65;
+      cout << "cout.put('a'):";
+      cout.put('a');
+      cout << "\ncout.put(c+25):";
+      cout.put(c + 25); //字母转换成整数再相加
+      cout << "\ncout.put(x):";
+      cout.put(x);
+      cout << "\ncout.put(str,20):";
+      cout.write(str, 20); //将str的前20个字节输入到流中
+      return 0;
+    }
     ```
 
 
@@ -4532,14 +4728,28 @@ using namespace std;
 
    - 从输入流中读入一个字符（包括空白），返回值就是该字符的ASII 码。如果碰到输入结束符，则返回值为系统常量 EOF（End Of File，文件结束标记）。
 
-   - 采用 EOF 判断输入是否结束
+   - 采用 EOF 判断输入是否结束(7-11)
 
      - ```C++
-       
+       #include <iostream>
+       #include <iomanip>
+   using namespace std;
+       int main()
+     {
+         int n = 0;
+         char ch;
+         while (ch = cin.get() != EOF) //遇到结束符才推出
+         {
+           cout.put(ch);
+           n++;
+         }
+         cout << "输入字符统计：" << n << endl;
+         return 0;
+       }
        ```
-
+       
      - `Ctrl + Z` 和 `Enter` 键代表文件结束
-
+     
      
 
 2. `getline()` 函数
@@ -4552,12 +4762,25 @@ using namespace std;
 
      - 从输入流中的当前字符开始读取 `bufSize-1` 个字符到缓冲区 `buf` ，或读到字符 `delim` 为止。函数会在 `buf` 中读入数据的结尾自动添加串结束标记 `\0`。
 
-   - `getline()` 函数功能演示
+   - `getline()` 函数功能演示(7-12)
 
      - ```C++
-       
+       #include <iostream>
+       #include <iomanip>
+   using namespace std;
+       int main()
+       {
+         char buf[10];
+         int i = 0;
+         while (cin.getline(buf, 10)) //输入超过九个就会出错
+         {
+           cout << ++i << ":" << buf << endl;
+           cout << "last:" << buf << endl;
+         }
+         return 0;
+       }
        ```
-
+       
        
 
 3. `eof()` 函数
@@ -4577,9 +4800,25 @@ using namespace std;
    - 从输入的字符串中提取电话号码(7-13)
 
      - ```C++
-       
+       #include <iostream>
+       #include <iomanip>
+   using namespace std;
+       int main()
+       {
+         char str[30];
+         while (!+cin.eof()) //当输入流没有结束时继续循环
+         {
+           cin.ignore(10, ':'); //在cin流中跳过':'之前的全部字符
+           if (!cin.eof())      //输入流没有结束
+           {
+             cin >> str; //输入电话号码
+             cout << str << endl;
+           }
+         }
+         return 0;
+       }
        ```
-
+       
        
 
 5. `peek()` 函数
@@ -4591,9 +4830,40 @@ using namespace std;
    - 日期格式转换(7-14)
 
      - ```C++
+       #include <iostream>
+       #include <iomanip>
+using namespace std;
+       string Months[13] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; //西文格式的月份
+       int main()
+       {
+         char ch;
+         int year, month, day;
+         while ((ch = cin.peek()) != EOF) //取输入流的第一个字符查看
+         {
+           if (ch > +'A' && ch < 'Z') //处理西文格式
+           {
+             string sMonth;
+             cin >> sMonth >> day >> year; //接收：月、日、年
+             // 查找月份完成转换
+             for (month = 0; month < 12 && sMonth != Months[month]; ++month)
+               ;
+           }
+           else
+           {
+             cin >> year;
+             cin.ignore() >> month;
+             cin.ignore() >> day;
+             // 以上三条语句等价于 cin>>year>>ch>>month>>ch>>day;
+           }
+           cin.ignore();
+           cout << setfill('0') << setw(2) << month;
+           cout << "-" << setw(2) << day << "-" << setw(4) << year << endl;
+         }
        
+         return 0;
+       }
        ```
-
+       
        
 
 
@@ -4669,8 +4939,30 @@ using namespace std;
 
    - 打开文件示例
 
-     - ```C++
-       
+     - 读取当前文件夹中 data.txt 的文件
+
+       ```C++
+       istream inFile;
+       inFile.open("data.txt",ios::in); //ios::in 是默认参数可省略
+       ```
+
+       或者
+
+       ```C++
+       ifstream inFile("data.txt",ios::in);
+       ```
+
+     - `2019`文件夹中创建文件 newfile 的二进制文件
+
+       ```C++
+       ifstream outFile;
+       outFile.open("c:\\2019\\newfile",ios::out|ios::binary);
+       ```
+
+       或者
+
+       ```C++
+       ifstream outFile("c:\\2019\\newfile",ios::out|ios::binary);
        ```
 
        
@@ -4679,18 +4971,31 @@ using namespace std;
 
    - 发出关闭文件指令后，系统会将缓冲区中的数据完整地写入文件，同时添加文件结束标记，切断流对象与外部文件的连接
 
+   - 格式示例
+
+     - ```C++
+       ifstream inFile;
+       inFile.open("file.txt",ios::in);
+    // 打开成功则进行读文件，省略
+       inFile.close();//关闭文件
+    //inFile 与 file.txt 断开连接，可用于其他文件
+       inFile.open("file.data",ios::in);//连接另一个文件
+       ```
+   
+    
+   
    - 建立流对象，调用 `open()` 函数连接外部文件(8-1)
-
+   
      - ```C++
        
        ```
-
+   
    - 调用流类带参数的构造函数打开文件(8-2)
-
+   
      - ```C++
        
        ```
-
+   
        
 
 ## 第三节 文件读写操作
@@ -4888,7 +5193,25 @@ using namespace std;
    - 定义求绝对值的函数模板,并进行不同的调用(9-1)
 
      - ```C++
-       
+       #include <iostream>
+       using namespace std;
+       template <typename T> //T 是占位符
+       T abs(T x)  //调用函数时自动判断类型 int abs(int n);
+       {
+         return x < 0 ? -x : x;
+       }
+       int main()
+       {
+         int n = -5;
+         int m = 10;
+         double d = -5;
+         float f = 3.2;
+         cout << n << "的绝对值：" << abs(n) << endl;
+         cout << m << "的绝对值：" << abs(m) << endl;
+         cout << d << "的绝对值：" << abs(d) << endl;
+         cout << f << "的绝对值：" << abs(f) << endl;
+         return 0;
+       }
        ```
 
    - 定义对象交换的函数模板(9-2)
@@ -4971,7 +5294,41 @@ using namespace std;
    - 二元数组类模板(9-6)
 
      - ```C++
-       
+       #include <iostream>
+       using namespace std;
+       template <class T1, class T2>
+       class Pair
+       {
+       public:
+         T1 first;
+         T2 second;
+         Pair(T1 k, T2 v) : first(k), second(v) {}
+         bool operator<(const Pair<T1, T2> &p) const;
+       };
+       template <class T1, class T2>
+       bool Pair<T1, T2>::operator<(const Pair<T1, T2> &p) const
+       {
+         return first < p.first;
+       }
+       int main()
+       {
+         Pair<string, int> student1("Tom", 19);
+         //
+         Pair<string, int> student2("Jim", 21);
+         //
+         Pair<string, string> dic("word", "danci");
+         Pair<int, int> coordinate(10, 20);
+         cout << "学生：" << student1.first << " " << student1.second << endl;
+         cout << "学生：" << student2.first << " " << student2.second << endl;
+         cout << "坐标：" << coordinate.first << " " << coordinate.second << endl;
+         cout << "学生：" << dic.first << " " << dic.second << endl;
+         bool a = student1 < student2;
+         if (a == 0)
+           cout << student1.first << "位于" << student2.first << "之后" << endl;
+         else
+           cout << student1.first << "位于" << student2.first << "之前" << endl;
+         return 0;
+       }
        ```
 
    - 类模板(9-7)
