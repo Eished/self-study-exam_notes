@@ -166,29 +166,25 @@ using namespace std;
 
   - ```C++
     static_cast<类型名>(表达式); //static_cast 可以省略
-    (类型名)(表达式) 或者 类型名(表达式) //省略后，简写方式
     
     oneInt2=static_cast<int>(oneDouble); //强制类型转换
     oneInt2=int(oneDouble); //强制类型转换运算符的新形式
     oneInt2=(int)oneDouble; //强制类型转换运算符的旧形式
     oneInt2=oneDouble; //自动类型转换
     ```
-```
-    
+
   - ```C++
     const_cast<类型名>(表达式); 
-```
+    ```
 
     - 用于去除指针和引用的常量性,不能去除变量的常量性
-    - 常量指针转化为非常量指针, 任指向原对象 (`const int *p=> int *p`)
+    - 常量指针转化为非常量指针, 任指向原对象(`const int *p=> int *p`)
     - 常量引用转化为非常量引用, 任指向原对象
-    - `static_cast` **可以省略**  `(类型名)(表达式)`
-  - 指针的教程: https://www.imooc.com/video/7858
-    
-  - 指针的本质就是内存地址
-  
+    - 指针的教程: https://www.imooc.com/video/7858
+      - 指针的本质就是内存地址
+
   - 示例: 
-  
+
     ```C++
     #include <iostream>
     using namespace std;
@@ -215,7 +211,7 @@ using namespace std;
       return 0;
     }
     ```
-  
+
   - 疑问: 常量的非常量指针修改内存地址内的值, 内存地址相同, 值不同
 
 
@@ -4331,16 +4327,16 @@ using namespace std;
       cout << "前" << count << "个整数的平均值 = " << 1.0 * sum / count << endl;
         return 0;
     }
-      ```
+    ```
   
   - `ios` 中错误状态字
   
   | 标识常量  |  值  |              含义              |
-    | :-------: | :--: | :----------------------------: |
+  | :-------: | :--: | :----------------------------: |
   | `goodbit` | 0X00 |           流状态正常           |
-    | `eofbit`  | 0X01 |           文件结束符           |
+  | `eofbit`  | 0X01 |           文件结束符           |
   | `failbit` | 0X02 | I/O 操作失败,数据未丢失,可恢复 |
-    | `badbit`  | 0X04 |   非法操作,数据丢失,不可恢复   |
+  | `badbit`  | 0X04 |   非法操作,数据丢失,不可恢复   |
   
   - `ios` 中流相关的成员函数, 可直接使用
   
