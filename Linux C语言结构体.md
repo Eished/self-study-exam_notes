@@ -84,8 +84,7 @@
 
   - `typedef int tni;`：把`int` 取别名 `tni`；
   - 不同于宏替换，预处理之后别名任然有效，等于普通变量
-  - 
-
+  
 - 通常用法，声明结构体类型
 
   - ```C
@@ -139,7 +138,7 @@
         int a = 0;
         float b = 0.0;
       
-        struct weapon weapon_1;
+        struct weapon weapon_1; // 可以省略 struct
       
         return 0;
       }
@@ -154,6 +153,8 @@
   - 初始化列表
 
     - 传入参数与结构体参数依次对应
+
+    - 可以省略 `struct`
 
     - ```C
         struct weapon weapon_1 = {"weapon_name", 100, 200};
