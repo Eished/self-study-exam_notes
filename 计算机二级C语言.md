@@ -1673,11 +1673,15 @@ int main()
       int atk;
       int price;
     };
+    
+    struct weapon weapon_1; // 单独定义
     ```
 
 - 声明变量
 
   - 可以直接在尾部定义变量
+
+    - 可以不声明结构体类型名字, 但不能重复使用
 
     - ```C
       struct weapon// 可以不声明结构体类型名字,但不能重复使用
@@ -1688,7 +1692,7 @@ int main()
       }weapon_1;
       ```
 
-  - 也可以单独定义
+  - 单独定义 + 起别名
 
     - ```C
       #include <stdio.h>
@@ -1698,6 +1702,11 @@ int main()
         int atk;
         int price;
       } weapon_2; //可以直接在尾部定义变量
+      
+      typedef struct{
+        // 声明和函数
+      }实例化变量; // 起别名
+      
       int main()
       {
         int a = 0;
@@ -1709,17 +1718,557 @@ int main()
       }
       ```
 
+
+1. **定义结构体的四种方法**
+
+   1. 创建结构体后，单独定义
+   2. 在结构体尾部定义变量
+   3. 不声明结构体类型名字 + 在尾部定义变量
+   4. `typedef struct Name;`  起别名
+
+2. **给结构体变量和数组赋初值**
+
+   1. 结构体变量赋值
+
+      ```c
+      struct student
+      { char name[12]:
+        char sex;
+        int year, month, day;
+        float sc[4];
+      }std={"Li Ming",'M',1962,5,10,88,76,85.5,90};
+      ```
+
+   2. 结构体数组赋值
+
+      ```c
+      struct bookcard
+      {	char num[5];
+      	float money;
+      }bk[3]={{"No1",35.5},{"NO.2″,25.0}，{"NO.3″,66.7}};
+      ```
+
+      结构体数组实例每个元素的子元素与结构体变量一一对应；
+
+3. 引用(使用)结构体变量中的数据
+
+   1. 结构体 `.`  值
+   2. 指针 `->` 值
+   3. 指针的值 `(*p).` 值
+
+### 14.3 共用体
+
+共用体(unon)的类型说明和变量的定义方式与结构体的类型说明和变量的定义方式完全相同,不同的是结构体变量中的成员各自占有自己的存储空间而共用体变量中的所有的成员占有同一个存储空间
+共用体变量所占内存字节与其成员中占字节数最多的那个成员相等即是4个字节.
+
+4.1 共用体
+
+- 也称为联合体，关键字：`union`
+
+**结构体与共用体不同：**
+
+- 结构体大小 = 最后一个成员的偏移量 + 最后一个成员的大小 + 末尾填充字节数
+
+  - 偏移量：某一成员地址与结构体首地址的距离
+
+  - 每个成员相对于首地址的偏移量都得是**当前成员所占内存的整数倍**
+
+  - 然后判断是不是**最宽变量类型的整数倍**
+
+    - ```C
+      struct data
+      {
+        int a;  // 4字节
+        char b; // 1字节,填充三字节
+        int c;  // 偏移量为8字节, 结构体总大小12字节, 然后判断是不是最宽变量类型的整数倍
+      };
+      ```
+
+- 共用体
+
+  - **初始化表只能有一个参数**
+
+  - **所有变量共用内存地址**
+
+  - ```C
+    #include <stdio.h>
+    union data 
+    {
+      int a;  
+      char b; 
+      int c; 
+    };
+    int main()
+    {
+      union data data_1; // 初始化表只能有一个常量
+      data_1.b = 'C';
+      data_1.a = 10; // 共用内存，覆盖前面的成员
+      printf("%d\n %d\n", data_1.b, data_1.a);
+      return 0;
+    }
+    ```
+
+
+
+
+### 14.4 静态链表
+
+链表的组成
+头指针: 存放一个地址,该地址指向一个元素
+结点: 用户需要的实际数据和链接节点的指针
+
+![image-20210319154351049](计算机二级C语言.assets/image-20210319154351049.png)
+
+- 创建静态链表
+
+  - ```C
+    #include <stdio.h>
+    struct weapon //自定义类型作为节点元素
+    {
+      int price;
+      int atk;
+      struct weapon *next; // 存放下一个节点的地址
+    };
+    int main()
+    {
+      struct weapon a, b, c, *head;
+      a.price = 100;
+      a.atk = 100;
+      b.price = 200;
+      b.atk = 200;
+      c.price = 300;
+      c.atk = 300;
+      // 连成链表
+      head = &a;
+      a.next = &b;
+      b.next = &c;
+      c.next = NULL;
+      // 生成指针p 访问结点
+      struct weapon *p;
+      p = head;
+      while (p != NULL)
+      {
+        printf("%d,%d\n", p->atk, p->price);
+        p = p->next;
+      }
+      
+      return 0;
+    }
+    ```
+
+- 在节点 `p,q` 之间插入节点关键算法
+
+  - 新插入点 `s`
+
+    ```c
+    s->next=p->next; // p->next==q; s->next=q;
+    p->next=s;
+    ```
+
+  - 再删除节点 `s`
+
+    ```c
+    p->next=s->next; // p->next=p->next->next;
+    free(s);
+    ```
+
     
+
+  
+
+### 14.5 动态链表
+
+- 程序运行时创建新节点。
+
+- 单向动态链表
+
+  - ```C
+    #include <malloc.h>
+    #include <stdio.h>
+    struct weapon //自定义类型作为节点元素
+    {
+      int price;
+      int atk;
+      struct weapon *next; // 存放下一个节点的地址
+    };
+    
+    struct weapon *create()
+    {
+      struct weapon *head;
+      struct weapon *p1, *p2;
+      int n = 0;
+      // malloc 分配内存 , sizeof 判断数据类型长度
+      p1 = p2 = (struct weapon *)malloc(sizeof(struct weapon));
+      scanf("%d,%d", &p1->price, &p1->atk); // 输入格式: 数据,数据
+      head = NULL;
+      while (p1->price != 0) // 输入 0 结束输入 
+      {
+        n++;
+        if (n == 1)
+          head = p1;
+        else
+          p2->next = p1;
+    
+        p2 = p1;
+        p1 = (struct weapon *)malloc(sizeof(struct weapon));
+        scanf("%d,%d", &p1->price, &p1->atk);
+      }
+      p2->next = NULL;
+      return head;
+    }
+    int main()
+    {
+      struct weapon *p;
+      p = create();
+      while (p != NULL)
+      {
+        printf("%d,%d\n", p->price, p->atk);
+        p = p->next;
+      }
+      return 0;
+    }
+    ```
+
+    
+
+
 
 ## 第十五章 位运算
 
+1. 位运算符的含义和使用
+2. 简单的位运算
+3. 比加减运算快一点，比乘除运算快很多
 
+### 15.1 位运算符
+
+1. 按位取反： `~`
+   - 二进制中0变1，1变0。
+2. 左移：`<<`
+   - 进制中向左移动一位，相当于原有数值乘以 2。
+3. 右移：`>>`
+   - 进制中向右移动一位，相当于原有数值除以 2。
+4. 按位与：`&`
+   -  `1&1=1，1&0=0，0&1=0，0&0=0`
+5. 按位异或：`^`
+   - 当两个值不同时候结果为 1。
+6. 按位或：`|`
+   -  `1&1=1，1&0=1，0&1=1，0&0=0`
+
+
+
+### 15.2 按位与 `&`
+
+- 二进制数进行逻辑与运算
+
+  - **必须是整型或字符型，必须补码形式**
+
+  - ```C
+    #include <stdio.h>
+    #include <malloc.h>
+    int main()
+    {
+      // & | ^ ~ << >>
+      int a = 4; // 00000000 00000000 00000000 00000100
+      int b = 7; // 00000000 00000000 00000000 00000111
+                 // 00000000 00000000 00000000 00000100
+      int C = a & b;
+      printf("%d\n", C);
+    
+      // 迅速清零： 与 0 按位与
+      int zero = a & 0;
+      printf("%d\n", zero);
+    
+      // 保留指定位: b 低八位 置1, a&b, 得到 a 的低八位
+      // 判断奇偶性: a&1=1 则是奇数，a&1=0 则是偶数
+      return 0;
+    }
+    ```
+
+    
+
+### 15.3 按位或 `|`
+
+```C
+#include <stdio.h>
+int main()
+{
+  //&|^~<< >>
+  int a = 9; // 00000000 00000000 00000000 00001001
+  int b = 5; // 00000000 00000000 00000000 00000101
+             // 00000000 00000000 00000000 00001101
+  int C = a | b;
+  printf("c=%d\n", c);
+  a = a | 0xFF; //低八位 置1
+  printf("a=%d\n", a);
+  return 0;
+}
+```
+
+
+
+### 15.4 按位异或 `^`
+
+```C
+#include <stdio. h>
+int main(){
+  //&|^~<<>>
+  int a=9;//0000 1001
+  int b=5;//0000 0101
+  				//0000 1100
+  int c=a^b;
+  printf("c=%d\n",c);
+  
+  // 定位翻转
+  // 数值交换
+  a = a^b;
+  b=b^a;
+  a=a^b;
+  printf("a=%d\n, b=%d\n" ,a,b);
+
+  return 0;
+}
+```
+
+- 取反 `~` 右结合性
+
+  - ```C
+    ~( 00001001 ) // 11110110
+    ```
+
+    
+
+### 15.5 左移右移 `<<` `>>`
+
+- 高位丢弃，低位补零
+  - 左移：乘以 2 的 n 次方
+  - 右移：除以 2 的 n 次方
+
+```C
+#include <stdio. h>
+int main(){
+// &|^~<<>>
+int a=3; //00000000 00000000 00000000 00000011
+a= a<<4; //00000000 00000000 00000000 00110000
+int i=1; //00000001
+				 //00000100
+return 0;
+}
+```
 
 
 
 ## 第十六章 文件
 
+只要求缓冲文件系统(即高级磁盘I\O系统)。对非标准缓冲文件系统(即低级磁盘I\O系统)不要求。
 
+1. 文件类型指针(FILE 类型指针)
+
+2. 文件的打开与关闭( fopen, fclose)
+
+3. 文件的读写 
+
+   (fputc, fgetc, fputs, fgets, fread, fwrite, fprintf, fscanf 函数的应用,
+
+   文件的定位( rewind,fseek函数的应用)
+
+### 16.1 C语言文件概述
+
+1. 计算中管理数据的方式通过文件
+
+   文件有两种：
+
+   1. 二进制文件
+   2. 文本文件
+
+### 16.2 文件指针
+
+1. 什么是文件指针?
+
+   文件指针实际上是指向一个结构体类型的指针.也就是说该指针中只能存放
+
+   结构体类型类型变量的地址.
+
+   文件类型指针变量的定义形式:`FE*指针变量名`
+
+   例如:`FILE *fp1,*fp2;`
+
+### 16.3 打开文件 fopen
+
+```c
+FILE *fp;
+fp=fopen("file_path","r");
+```
+
+read write append
+
+- `r`：(只读)为输入打开一个文本文件
+- `w`：(只写)为输出打开个文本文件
+- `r`：(追加)向文本文件尾增加数据
+- `rb`：(只读)为输入打开一个**二进制**文件
+- `wb`：(只写)为输出打开一个**二进制**文件
+- `ab`：(追加)向**二进制**文件尾增加数据
+- `r+`：(读写)为**读/写 **打开一个文本文件
+- `w+`：(读写)为**读/写** 建立一个新的文本文件
+- `a+`：(读写)为**读/写** 打开个文本文件
+- `rb+`：(读写)为**读/写**打开个**二进制**文件
+- `wb+`：(读写)为**读/写**建立一个新的**二进制**文件
+- `ab+`：(读写)为**读/写**打开个**二进制**文件
+
+
+
+### 16.4 关闭文件 fclose
+
+```c
+FILE *fpl, *fp2;
+fp=fopen(" file_path","r");
+fclose(fp);
+```
+
+
+
+### 16.5文件写入与读取
+
+- Write
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+int main(void)
+{
+  FILE *fp;
+  char ch, fileName[10];
+  scanf("%s", fileName);
+  if ((fp = fopen(fileName, "w")) == NULL)
+  {
+    printf("Can't Open File\n");
+    exit(0); // 终止程序
+  }
+  ch = getchar(); // 接收执行scanf语句时最后输入的回车符
+  ch = getchar(); // 接收输入的第一个字符
+  while (ch != '#')
+  {
+    fputc(ch, fp);
+    putchar(ch);
+    ch = getchar();
+    fclose(fp);
+  }
+}
+
+```
+
+- Read
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+int main(void)
+{
+  FILE *fp;
+  char ch;
+  if ((fp = fopen("123", "r")) == NULL)
+  {
+    printf("Can't Open File\n");
+    exit(0); // 终止程序
+  }
+  ch = getc(fp); // 接收一个字符
+  while (ch != EOF)
+  {
+    putchar(ch);
+    ch = getc(fp);
+    fclose(fp);
+  }
+}
+
+```
+
+
+
+### 16.6 判断文件结束feof
+
+使用方法: `feof(文件指针)`
+例如:
+
+```
+FILE * fp
+feof( fp)
+```
+
+结束返回1
+
+否则返回0
+
+
+
+### 16.7 fprintf() 和 fscanf() 函数应用
+
+格式化读写函数 `fprintf() 和 fscanf()` 
+
+函数调用
+
+```c
+fprintf(文件指针,格式字符串,输出表列);
+fscanf(文件指针,格式字符串,输入表列);
+```
+
+磁盘文件中**读入**或**输出**字符
+
+```c
+fprintf(fp, %d, %6.2f", i, t);
+fscanf (fp, "%d, %f", &i, &t);
+```
+
+
+
+### 16.8 fgets() 和 fputs() 函数应用
+
+1. gets 函数
+   1. **从指定文件读入一个字符串.**
+   2. 函数调用
+      1. fgets(str,n, fp)
+      2. 从印指向的文件输入n-1个字符,在最后加 `‘\0’` ;
+   3. 返回值
+      1. str的首地址
+2. fputs 函数
+   1. 向指定的文件输出一个字符串
+   2. 函数调用
+      1. `fputs("china", fp);`
+      2. 第一个参数可以是字符串常量、字符数组名或字符指针.
+      3. 字符串末尾的`\0`不输出.
+   3. 返回值
+      1. 输入成功,返回值为`0`
+      2. 输入失败,返回`EOF`.
+
+
+
+### 16.9 fread() 和 fwrite() 函数应用
+
+1. fread 和 write 函数的应用
+
+   两个函数 fread 和 fwrite 的调用形式完全相同
+
+   1.  `fread( buffer, size, count, fp);`
+
+      buffer是数据块的指针.它是内存的首地址,输入的数据存入此数据块中.
+
+   2. `fwrite( buffer, size, count, fp);`
+
+      buffer是数据块的指针,它是准备输出的数据的起始地址.
+
+
+
+### 16.10 文件定位
+
+1. 文件定位函数( rewind、 fseek和fte函数)的应用
+
+   1. **rewind 函数** 又称"反绕"函数，此函数的调用形式为: `rewind(pf);`
+
+      此函数没有返回值。函数的功能是**使文件的位置指针回到文件的开头**。
+
+   2. **fseek 函数**的调用形式为: `fseek(pf,offset,origin);`
+      用来**移动文件位置指针到指定的位置上**，接着的读写操作将从此位置开始。
+
+   3. **ftell 函数**的调用式: `ftell(fp);`
+      用以**获得文件当前位置指针的位置**。当函数调用出错时函数的返回值为 `-1L`。
 
 
 
