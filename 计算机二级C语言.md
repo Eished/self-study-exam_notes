@@ -562,7 +562,7 @@ int main()
 3. 标准库函数的调用形式: 函数名(参数表)
    例：`y=sqrt(13);//开平方`
 
-**常用数学函数**
+#### **常用数学函数**
 
 - pow(底数,指数) 求幂
 - sqrt(数值) 开平方
@@ -700,6 +700,29 @@ void swap(int a, int b)
   t = a, a = b, b = t;
   printf("(3)a=%d b=%d\n", a, b);
 }
+```
+
+
+
+#### 函数传参注意
+
+后`-- ++` 优先级低于函数。
+
+```c
+#include<stdio.h>
+int fun(int d)
+{
+	printf("%d",d);
+}
+
+void main()
+{
+	int a=4;
+	fun(a--);
+	printf("%d",a);
+}
+
+// 输出 43
 ```
 
 
@@ -1232,6 +1255,8 @@ int main()
 }
 
 ```
+
+![image-20210322165622140](计算机二级C语言.assets/image-20210322165622140.png)
 
 
 
@@ -2190,7 +2215,9 @@ FILE *fp;
 fp=fopen("file_path","r");
 ```
 
-read write append
+`read write append` 
+
+`+`：读写
 
 - `r`：(只读)为输入打开一个文本文件
 - `w`：(只写)为输出打开个文本文件
