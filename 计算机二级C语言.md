@@ -87,6 +87,13 @@ exit(0)表示进程非正常退出. 返回 0.
 
 ![img](http://c.biancheng.net/cpp/uploads/allimg/120205/1-120205192420113.jpg)
 
+#### 数据类型转换
+
+- ```c
+  (type_name) expression;
+  (int)1.0;
+  ```
+
 ### 复合赋值表达式
 
 主要运算符号
