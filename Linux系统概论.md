@@ -54,10 +54,54 @@
   - `cat [文件名]`  查看文件
 - 删除
   - `rm [文件名]`
-  - `rm [文件夹]`
+  - 删除文件夹
+    - `rm -r [文件夹]` 递归删除
     - `rm -rf [文件夹]` 递归强制删除
 - 写入
   - `vim [文件名]`
+  - `echo "内容" >> [文件名] ` 追加内容
+  - `echo "内容" > [文件名] ` 覆盖内容
+- 下载
+  - `wget [url]`
+- 解压
+  - `tar [操作] [文件名]` 
+    - `tar zxvf linux-gtk.tar.gz  ` 
+    - `z`：gz 压缩包
+    - `x`：解压缩
+    - `v`：显示过程
+    - `f`：用包名作为文件夹名
+- 压缩
+  - `tar [操作] [文件名] [目录]` 
+    - `tar zcvf linux-gtk.tar.gz linux-gtk  ` 
+    - `c`：压缩
+
+### 进程相关命令
+
+- 只显示过滤的进程。
+
+  - ```
+    ps [options] | grep [options]
+    ```
+
+  - `ps -ef|grep docker`
+
+- 实时显示进程
+
+  - `top`
+    - `m`：内存占用
+    - `c`：cpu占用
+
+- 停止进程
+
+  - `kill 9 [pid]`
+
+- 查看服务状态
+
+  - `service sshd status`
+  - 关闭
+    - `service sshd stop`
+    - `restart`
+  - `systemctl status sshd`
 
 ### Linux 文件类型
 
