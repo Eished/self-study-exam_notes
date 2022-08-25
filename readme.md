@@ -1,10 +1,12 @@
 # 自考本科相关笔记
 
-Markdown 笔记均使用 [Typora](https://typora.io/) 编写，clone 至本地后使用 Typora 浏览。
+Markdown 笔记均使用 [Typora](https://typora.io/) 编写，clone 至本地后使用 Typora 浏览，或[点击 Source code (zip)下载压缩包](https://github.com/Eished/self-study-exam_notes/releases)。
 
 公式、图表等需要打开 Typora 对应设置才能正常显示。
 
 考试总规划、复习规划表、专业课程表和考试作息时间表：[深圳大学自考本科考试计划表.xlsx](深圳大学自考本科考试计划表.xlsx)（下载整个项目至本地后使用 Excel 打开）
+
+数据结构导论 02142 和 C++ 程序设计 04737 需要 C 语言基础，建议先考全国计算机等级考试二级 C 语言，可用于顶替管理信息系统两门课 02383 02382。
 
 ## 自考计划
 
