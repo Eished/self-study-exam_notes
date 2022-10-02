@@ -1,6 +1,6 @@
 # 自考本科相关笔记
 
-Markdown 笔记均使用 [Typora](https://typora.io/) 编写，clone 至本地后使用 Typora 浏览，或[点击下载压缩包](https://github.com/Eished/self-study-exam_notes/archive/refs/heads/master.zip)。
+Markdown 笔记均使用 [Typora](https://typora.io/) 编写（Typora 已经开始收费，可使用免费的 [MarkText](https://github.com/marktext/marktext) 作为替代），clone 至本地后使用 Typora 浏览，或[点击下载压缩包](https://github.com/Eished/self-study-exam_notes/archive/refs/heads/master.zip)。
 
 公式、图表等需要打开 Typora 对应设置才能正常显示。
 
